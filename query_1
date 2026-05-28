@@ -91,7 +91,17 @@ CREATE TABLE QUERY_MEVAJI.alianza (
 );
 
 CREATE TABLE QUERY_MEVAJI.propuesta (
-    
+    propuesta_id INT IDENTITY(1,1) PRIMARY KEY,
+    solicitud_id INT foreign key REFERENCES QUERY_MEVAJI.solicitud(solicitud_id),
+    agente_id INT foreign key REFERENCES QUERY_MEVAJI.agente(agente_id),
+    fecha_emision DATE,
+    vigencia_hasta DATE,
+    fecha_desde DATE,
+    fecha_hasta DATE,
+    subtotal DECIMAL(18,2),
+    descuento DECIMAL(18,2),
+    importe_total DECIMAL(18,2),
+    estado nvarchar(255)
 );
 
 CREATE TABLE QUERY_MEVAJI.estado_de_propuesta (
@@ -99,19 +109,51 @@ CREATE TABLE QUERY_MEVAJI.estado_de_propuesta (
 );
 
 CREATE TABLE QUERY_MEVAJI.solicitud (
-    
+    solicitud_id INT IDENTITY(1,1) PRIMARY KEY,
+    cliente_id INT foreign key REFERENCES QUERY_MEVAJI.cliente(cliente_id),
+    agencia_id INT foreign key REFERENCES QUERY_MEVAJI.agencia(agencia_id),
+    nro_solicitud BIGINT,
+    fecha_solicitud DATE,
+    fecha_inicio_tentativa DATE,
+    fecha_fin_tentativa DATE,
+    cant_pax INT,
+    observaciones nvarchar(max),
+    presupuesto_estimado DECIMAL(18,2)
+
 );
 
 CREATE TABLE QUERY_MEVAJI.detalle_solicitud (
-    
+    detalle_solicitud_id INT IDENTITY(1,1) PRIMARY KEY,
+    solicitud_id INT foreign key REFERENCES QUERY_MEVAJI.solicitud(solicitud_id),
+    ciudad_id INT foreign key REFERENCES QUERY_MEVAJI.ciudad(ciudad_id),
+    cant_dias_aprox INT,
+    observaciones nvarchar(max)
 );
 
 CREATE TABLE QUERY_MEVAJI.venta (
-    
+    venta_id INT IDENTITY(1,1) PRIMARY KEY,
+    propuesta_id INT foreign key REFERENCES QUERY_MEVAJI.propuesta(propuesta_id),
+    cliente_id INT foreign key REFERENCES QUERY_MEVAJI.cliente(cliente_id),
+    nro_venta BIGINT,
+    canal_de_venta_id INT foreign key REFERENCES QUERY_MEVAJI.canal_de_venta(canal_de_venta_id),
+    medio_de_pago_id INT foreign key REFERENCES QUERY_MEVAJI.medio_de_pago(medio_de_pago_id),
+    fecha_venta DATE,
+    subtotal DECIMAL(18,2),
+    descuento DECIMAL(18,2),
+    importe_total DECIMAL(18,2)
 );
 
 CREATE TABLE QUERY_MEVAJI.detalle_propuesta_hospedaje (
-    
+    propuesta_id INT,
+    habitacion_id INT,
+    fecha_desde DATE,
+    fecha_hasta DATE,
+    cant INT,
+    precio DECIMAL(18,2),
+    subtotal DECIMAL(18,2),
+    primary key (propuesta_id, habitacion_id, fecha_desde, fecha_hasta),
+    foreign key (propuesta_id) references QUERY_MEVAJI.propuesta(propuesta_id),
+    foreign key (habitacion_id) references QUERY_MEVAJI.habitacion(habitacion_id)
 );
 
 CREATE TABLE QUERY_MEVAJI.detalle_venta_hospedaje (
