@@ -5,30 +5,12 @@ CREATE SCHEMA QUERY_MEVAJI;
 GO
 
 -- CREACION DE TABLAS --
-
-CREATE TABLE QUERY_MEVAJI.provincia (
-    provincia_id INT IDENTITY(1,1) PRIMARY KEY,
-    pais_id INT foreign key REFERENCES QUERY_MEVAJI.pais(pais_id),
-    descripcion nvarchar(255)
-);
-
-CREATE TABLE QUERY_MEVAJI.ciudad (
-    ciudad_id INT IDENTITY(1,1) PRIMARY KEY,
-    provincia_id INT foreign key REFERENCES QUERY_MEVAJI.provincia(provincia_id),
-    descripcion nvarchar(255)
-);
-
-CREATE TABLE QUERY_MEVAJI.localidad (
-    localidad_id INT IDENTITY(1,1) PRIMARY KEY,
-    ciudad_id INT foreign key REFERENCES QUERY_MEVAJI.ciudad(ciudad_id),
-    descripcion nvarchar(255)
-);
+-- Orden: primero tablas maestras sin dependencias, luego las que dependen de ellas
 
 CREATE TABLE QUERY_MEVAJI.pais (
     pais_id INT IDENTITY(1,1) PRIMARY KEY,
     descripcion nvarchar(255)
 );
-
 
 CREATE TABLE QUERY_MEVAJI.canal_de_venta (
     canal_de_venta_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -40,118 +22,21 @@ CREATE TABLE QUERY_MEVAJI.medio_de_pago (
     descripcion nvarchar(255)
 );
 
-
-CREATE TABLE QUERY_MEVAJI.agencia (
-    agencia_id INT IDENTITY(1,1) PRIMARY KEY,
-    direccion nvarchar(255),
-    localidad_id INT foreign key REFERENCES QUERY_MEVAJI.localidad(localidad_id),
-    telefono nvarchar(255),
-    mail nvarchar(255),
-    nro_agencia BIGINT
-);
-
-CREATE TABLE QUERY_MEVAJI.agente (
-    agente_id INT IDENTITY(1,1) PRIMARY KEY,
-    agencia_id INT foreign key REFERENCES QUERY_MEVAJI.agencia(agencia_id),
-    legajo BIGINT,
-    nombre nvarchar(255),
-    apellido nvarchar(255),
-    dni BIGINT,
-    telefono nvarchar(255),
-    mail nvarchar(255),
-    fecha_nac DATE,
-    direccion nvarchar(255),
-    localidad_id INT foreign key REFERENCES QUERY_MEVAJI.localidad(localidad_id)
-);
-
-
-CREATE TABLE QUERY_MEVAJI.cliente (
-    cliente_id INT IDENTITY(1,1) PRIMARY KEY,
-    nombre nvarchar(255),
-    apellido nvarchar(255),
-    dni BIGINT,
-    telefono nvarchar(255),
-    mail nvarchar(255),
-    fecha_nac DATE,
-    direccion nvarchar(255),
-    localidad_id INT foreign key REFERENCES QUERY_MEVAJI.localidad(localidad_id)
-);
-
-CREATE TABLE QUERY_MEVAJI.encuesta (
-    encuesta_id INT IDENTITY(1,1) PRIMARY KEY,
-    cliente_id INT foreign key REFERENCES QUERY_MEVAJI.cliente(cliente_id),
-    agente_id INT foreign key REFERENCES QUERY_MEVAJI.agente(agente_id),
-    fecha DATE,
-    comentario nvarchar(max),
-);
-
-CREATE TABLE QUERY_MEVAJI.detalle_encuesta (
-    encuesta_id INT,
-    aspecto_id INT,
-    puntaje INT,
-    primary key (encuesta_id, aspecto_id),
-    foreign key (encuesta_id) references QUERY_MEVAJI.encuesta(encuesta_id),
-    foreign key (aspecto_id) references QUERY_MEVAJI.aspecto(aspecto_id)
-);
-
 CREATE TABLE QUERY_MEVAJI.aspecto (
     aspecto_id INT IDENTITY(1,1) PRIMARY KEY,
     descripcion nvarchar(255)
 );
 
+CREATE TABLE QUERY_MEVAJI.alianza (
+    alianza_id INT IDENTITY(1,1) PRIMARY KEY,
+    descripcion nvarchar(255)
+);
 
 CREATE TABLE QUERY_MEVAJI.proveedor (
     proveedor_id INT IDENTITY(1,1) PRIMARY KEY,
     nombre nvarchar(255),
     telefono nvarchar(255),
-    mail nvarchar(255),
-);
-
-CREATE TABLE QUERY_MEVAJI.aerolinea (
-    aerolinea_id INT IDENTITY(1,1) PRIMARY KEY,
-    nombre nvarchar(255),
-    codigo nvarchar(255),
-    pais_id INT foreign key REFERENCES QUERY_MEVAJI.pais(pais_id),
-    alianza_id INT foreign key REFERENCES QUERY_MEVAJI.alianza(alianza_id)
-);
-
-CREATE TABLE QUERY_MEVAJI.aeropuerto (
-    aeropuerto_id INT IDENTITY(1,1) PRIMARY KEY,
-    codigo nvarchar(10),
-    ciudad_id INT foreign key REFERENCES QUERY_MEVAJI.ciudad(ciudad_id),
-    descripcion nvarchar(255)
-);
-
-CREATE TABLE QUERY_MEVAJI.hospedaje (
-    hospedaje_id INT IDENTITY(1,1) PRIMARY KEY,
-    ciudad_id INT foreign key REFERENCES QUERY_MEVAJI.ciudad(ciudad_id),
-    nombre nvarchar(255),
-    incluye_desayuno BIT,
-    check_in TIME,
-    check_out TIME
-);
-
-CREATE TABLE QUERY_MEVAJI.habitacion (
-    habitacion_id INT IDENTITY(1,1) PRIMARY KEY,
-    hospedaje_id INT foreign key REFERENCES QUERY_MEVAJI.hospedaje(hospedaje_id),
-    nombre nvarchar(255),
-    descripcion nvarchar(255),
-    precio_noche DECIMAL(18,2)
-);
-
-CREATE TABLE QUERY_MEVAJI.vuelo (
-    vuelo_id INT IDENTITY(1,1) PRIMARY KEY,
-    aerolinea_id INT foreign key REFERENCES QUERY_MEVAJI.aerolinea(aerolinea_id),
-    aeropuesto_origen_id INT foreign key REFERENCES QUERY_MEVAJI.aeropuerto(aeropuerto_id),
-    aeropuerto_destino_id INT foreign key REFERENCES QUERY_MEVAJI.aeropuerto(aeropuerto_id),
-    fecha_salida DATE,
-    horario_salida NVARCHAR(50),
-    fecha_llegada DATE,
-    horario_llegada NVARCHAR(50),
-    duracion INT,
-    precio DECIMAL(18,2),
-    incluye_carry BIT, 
-    incluye_valija BIT
+    mail nvarchar(255)
 );
 
 CREATE TABLE QUERY_MEVAJI.excursion (
@@ -163,15 +48,153 @@ CREATE TABLE QUERY_MEVAJI.excursion (
     precio DECIMAL(18,2)
 );
 
-CREATE TABLE QUERY_MEVAJI.alianza (
-    alianza_id INT IDENTITY(1,1) PRIMARY KEY,
+CREATE TABLE QUERY_MEVAJI.estado_de_propuesta (
+    estado_id INT IDENTITY(1,1) PRIMARY KEY,
     descripcion nvarchar(255)
+);
+
+CREATE TABLE QUERY_MEVAJI.provincia (
+    provincia_id INT IDENTITY(1,1) PRIMARY KEY,
+    pais_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.pais(pais_id),
+    descripcion nvarchar(255)
+);
+
+CREATE TABLE QUERY_MEVAJI.ciudad (
+    ciudad_id INT IDENTITY(1,1) PRIMARY KEY,
+    provincia_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.provincia(provincia_id),
+    descripcion nvarchar(255)
+);
+
+CREATE TABLE QUERY_MEVAJI.localidad (
+    localidad_id INT IDENTITY(1,1) PRIMARY KEY,
+    ciudad_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.ciudad(ciudad_id),
+    descripcion nvarchar(255)
+);
+
+CREATE TABLE QUERY_MEVAJI.agencia (
+    agencia_id INT IDENTITY(1,1) PRIMARY KEY,
+    direccion nvarchar(255),
+    localidad_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.localidad(localidad_id),
+    telefono nvarchar(255),
+    mail nvarchar(255),
+    nro_agencia BIGINT
+);
+
+CREATE TABLE QUERY_MEVAJI.agente (
+    agente_id INT IDENTITY(1,1) PRIMARY KEY,
+    agencia_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.agencia(agencia_id),
+    legajo BIGINT,
+    nombre nvarchar(255),
+    apellido nvarchar(255),
+    dni BIGINT,
+    telefono nvarchar(255),
+    mail nvarchar(255),
+    fecha_nac DATE,
+    direccion nvarchar(255),
+    localidad_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.localidad(localidad_id)
+);
+
+CREATE TABLE QUERY_MEVAJI.cliente (
+    cliente_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre nvarchar(255),
+    apellido nvarchar(255),
+    dni BIGINT,
+    telefono nvarchar(255),
+    mail nvarchar(255),
+    fecha_nac DATE,
+    direccion nvarchar(255),
+    localidad_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.localidad(localidad_id)
+);
+
+CREATE TABLE QUERY_MEVAJI.encuesta (
+    encuesta_id INT IDENTITY(1,1) PRIMARY KEY,
+    cliente_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.cliente(cliente_id),
+    agente_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.agente(agente_id),
+    fecha DATE,
+    comentario nvarchar(max)
+);
+
+CREATE TABLE QUERY_MEVAJI.detalle_encuesta (
+    encuesta_id INT NOT NULL,
+    aspecto_id INT NOT NULL,
+    puntaje INT,
+    PRIMARY KEY (encuesta_id, aspecto_id),
+    FOREIGN KEY (encuesta_id) REFERENCES QUERY_MEVAJI.encuesta(encuesta_id),
+    FOREIGN KEY (aspecto_id) REFERENCES QUERY_MEVAJI.aspecto(aspecto_id)
+);
+
+CREATE TABLE QUERY_MEVAJI.aerolinea (
+    aerolinea_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre nvarchar(255),
+    codigo nvarchar(255),
+    pais_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.pais(pais_id),
+    alianza_id INT FOREIGN KEY REFERENCES QUERY_MEVAJI.alianza(alianza_id)
+);
+
+CREATE TABLE QUERY_MEVAJI.aeropuerto (
+    aeropuerto_id INT IDENTITY(1,1) PRIMARY KEY,
+    codigo nvarchar(10),
+    ciudad_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.ciudad(ciudad_id),
+    descripcion nvarchar(255)
+);
+
+CREATE TABLE QUERY_MEVAJI.vuelo (
+    vuelo_id INT IDENTITY(1,1) PRIMARY KEY,
+    aerolinea_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.aerolinea(aerolinea_id),
+    aeropuesto_origen_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.aeropuerto(aeropuerto_id),
+    aeropuerto_destino_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.aeropuerto(aeropuerto_id),
+    fecha_salida DATE,
+    horario_salida NVARCHAR(50),
+    fecha_llegada DATE,
+    horario_llegada NVARCHAR(50),
+    duracion INT,
+    precio DECIMAL(18,2),
+    incluye_carry BIT,
+    incluye_valija BIT
+);
+
+CREATE TABLE QUERY_MEVAJI.hospedaje (
+    hospedaje_id INT IDENTITY(1,1) PRIMARY KEY,
+    ciudad_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.ciudad(ciudad_id),
+    nombre nvarchar(255),
+    incluye_desayuno BIT,
+    check_in TIME,
+    check_out TIME
+);
+
+CREATE TABLE QUERY_MEVAJI.habitacion (
+    habitacion_id INT IDENTITY(1,1) PRIMARY KEY,
+    hospedaje_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.hospedaje(hospedaje_id),
+    nombre nvarchar(255),
+    descripcion nvarchar(255),
+    precio_noche DECIMAL(18,2)
+);
+
+CREATE TABLE QUERY_MEVAJI.solicitud (
+    solicitud_id INT IDENTITY(1,1) PRIMARY KEY,
+    cliente_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.cliente(cliente_id),
+    agencia_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.agencia(agencia_id),
+    nro_solicitud BIGINT,
+    fecha_solicitud DATE,
+    fecha_inicio_tentativa DATE,
+    fecha_fin_tentativa DATE,
+    cant_pax INT,
+    observaciones nvarchar(max),
+    presupuesto_estimado DECIMAL(18,2)
+);
+
+CREATE TABLE QUERY_MEVAJI.detalle_solicitud (
+    detalle_solicitud_id INT IDENTITY(1,1) PRIMARY KEY,
+    solicitud_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.solicitud(solicitud_id),
+    ciudad_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.ciudad(ciudad_id),
+    cant_dias_aprox INT,
+    observaciones nvarchar(max)
 );
 
 CREATE TABLE QUERY_MEVAJI.propuesta (
     propuesta_id INT IDENTITY(1,1) PRIMARY KEY,
-    solicitud_id INT foreign key REFERENCES QUERY_MEVAJI.solicitud(solicitud_id),
-    agente_id INT foreign key REFERENCES QUERY_MEVAJI.agente(agente_id),
+    solicitud_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.solicitud(solicitud_id),
+    agente_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.agente(agente_id),
     fecha_emision DATE,
     vigencia_hasta DATE,
     fecha_desde DATE,
@@ -182,40 +205,13 @@ CREATE TABLE QUERY_MEVAJI.propuesta (
     estado nvarchar(255)
 );
 
-CREATE TABLE QUERY_MEVAJI.estado_de_propuesta (
-    estado_id INT IDENTITY(1,1) PRIMARY KEY,
-    descripcion nvarchar(255)
-);
-
-CREATE TABLE QUERY_MEVAJI.solicitud (
-    solicitud_id INT IDENTITY(1,1) PRIMARY KEY,
-    cliente_id INT foreign key REFERENCES QUERY_MEVAJI.cliente(cliente_id),
-    agencia_id INT foreign key REFERENCES QUERY_MEVAJI.agencia(agencia_id),
-    nro_solicitud BIGINT,
-    fecha_solicitud DATE,
-    fecha_inicio_tentativa DATE,
-    fecha_fin_tentativa DATE,
-    cant_pax INT,
-    observaciones nvarchar(max),
-    presupuesto_estimado DECIMAL(18,2)
-
-);
-
-CREATE TABLE QUERY_MEVAJI.detalle_solicitud (
-    detalle_solicitud_id INT IDENTITY(1,1) PRIMARY KEY,
-    solicitud_id INT foreign key REFERENCES QUERY_MEVAJI.solicitud(solicitud_id),
-    ciudad_id INT foreign key REFERENCES QUERY_MEVAJI.ciudad(ciudad_id),
-    cant_dias_aprox INT,
-    observaciones nvarchar(max)
-);
-
 CREATE TABLE QUERY_MEVAJI.venta (
     venta_id INT IDENTITY(1,1) PRIMARY KEY,
-    propuesta_id INT foreign key REFERENCES QUERY_MEVAJI.propuesta(propuesta_id),
-    cliente_id INT foreign key REFERENCES QUERY_MEVAJI.cliente(cliente_id),
+    propuesta_id INT FOREIGN KEY REFERENCES QUERY_MEVAJI.propuesta(propuesta_id),
+    cliente_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.cliente(cliente_id),
     nro_venta BIGINT,
-    canal_de_venta_id INT foreign key REFERENCES QUERY_MEVAJI.canal_de_venta(canal_de_venta_id),
-    medio_de_pago_id INT foreign key REFERENCES QUERY_MEVAJI.medio_de_pago(medio_de_pago_id),
+    canal_de_venta_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.canal_de_venta(canal_de_venta_id),
+    medio_de_pago_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.medio_de_pago(medio_de_pago_id),
     fecha_venta DATE,
     subtotal DECIMAL(18,2),
     descuento DECIMAL(18,2),
@@ -223,64 +219,64 @@ CREATE TABLE QUERY_MEVAJI.venta (
 );
 
 CREATE TABLE QUERY_MEVAJI.detalle_propuesta_hospedaje (
-    propuesta_id INT,
-    habitacion_id INT,
+    propuesta_id INT NOT NULL,
+    habitacion_id INT NOT NULL,
     fecha_desde DATE,
     fecha_hasta DATE,
     cant INT,
     precio DECIMAL(18,2),
     subtotal DECIMAL(18,2),
-    primary key (propuesta_id, habitacion_id),
-    foreign key (propuesta_id) references QUERY_MEVAJI.propuesta(propuesta_id),
-    foreign key (habitacion_id) references QUERY_MEVAJI.habitacion(habitacion_id)
+    PRIMARY KEY (propuesta_id, habitacion_id),
+    FOREIGN KEY (propuesta_id) REFERENCES QUERY_MEVAJI.propuesta(propuesta_id),
+    FOREIGN KEY (habitacion_id) REFERENCES QUERY_MEVAJI.habitacion(habitacion_id)
 );
 
 CREATE TABLE QUERY_MEVAJI.detalle_venta_hospedaje (
-    venta_id INT,
-    habitacion_id INT,
+    venta_id INT NOT NULL,
+    habitacion_id INT NOT NULL,
     fecha_desde DATE,
     fecha_hasta DATE,
     cant INT,
     precio_unitario DECIMAL(18,2),
     subtotal DECIMAL(18,2),
     cod_reserva nvarchar(255),
-    primary key (venta_id, habitacion_id),
-    foreign key (venta_id) references QUERY_MEVAJI.venta(venta_id),
-    foreign key (habitacion_id) references QUERY_MEVAJI.habitacion(habitacion_id)
+    PRIMARY KEY (venta_id, habitacion_id),
+    FOREIGN KEY (venta_id) REFERENCES QUERY_MEVAJI.venta(venta_id),
+    FOREIGN KEY (habitacion_id) REFERENCES QUERY_MEVAJI.habitacion(habitacion_id)
 );
 
 CREATE TABLE QUERY_MEVAJI.detalle_propuesta_vuelo (
-    propuesta_id INT,
-    vuelo_id INT,
+    propuesta_id INT NOT NULL,
+    vuelo_id INT NOT NULL,
     cant_pasajes INT,
-    precio DECIMAL(18,2), 
+    precio DECIMAL(18,2),
     subtotal DECIMAL(18,2),
-    primary key (propuesta_id, vuelo_id),
-    foreign key (propuesta_id) references QUERY_MEVAJI.propuesta(propuesta_id),
-    foreign key (vuelo_id) references QUERY_MEVAJI.vuelo(vuelo_id)
+    PRIMARY KEY (propuesta_id, vuelo_id),
+    FOREIGN KEY (propuesta_id) REFERENCES QUERY_MEVAJI.propuesta(propuesta_id),
+    FOREIGN KEY (vuelo_id) REFERENCES QUERY_MEVAJI.vuelo(vuelo_id)
 );
 
 CREATE TABLE QUERY_MEVAJI.detalle_venta_vuelo (
-    venta_id INT,
-    vuelo_id INT,
+    venta_id INT NOT NULL,
+    vuelo_id INT NOT NULL,
     cant_pasajes INT,
     precio_unitario DECIMAL(18,2),
     subtotal DECIMAL(18,2),
     cod_reserva nvarchar(255),
-    primary key (venta_id, vuelo_id),
-    foreign key (venta_id) references QUERY_MEVAJI.venta(venta_id),
-    foreign key (vuelo_id) references QUERY_MEVAJI.vuelo(vuelo_id)
+    PRIMARY KEY (venta_id, vuelo_id),
+    FOREIGN KEY (venta_id) REFERENCES QUERY_MEVAJI.venta(venta_id),
+    FOREIGN KEY (vuelo_id) REFERENCES QUERY_MEVAJI.vuelo(vuelo_id)
 );
 
 CREATE TABLE QUERY_MEVAJI.detalle_venta_excursion (
-    venta_id INT,
-    excursion_id INT,
+    venta_id INT NOT NULL,
+    excursion_id INT NOT NULL,
     fecha_reserva DATE,
     cant INT,
     precio_unitario DECIMAL(18,2),
     subtotal DECIMAL(18,2),
     cod_reserva nvarchar(255),
-    primary key (venta_id, excursion_id),
-    foreign key (venta_id) references QUERY_MEVAJI.venta(venta_id),
-    foreign key (excursion_id) references QUERY_MEVAJI.excursion(excursion_id)
+    PRIMARY KEY (venta_id, excursion_id),
+    FOREIGN KEY (venta_id) REFERENCES QUERY_MEVAJI.venta(venta_id),
+    FOREIGN KEY (excursion_id) REFERENCES QUERY_MEVAJI.excursion(excursion_id)
 );
