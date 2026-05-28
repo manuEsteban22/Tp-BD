@@ -31,42 +31,80 @@ CREATE TABLE QUERY_MEVAJI.pais (
 
 
 CREATE TABLE QUERY_MEVAJI.canal_de_venta (
-    
+    canal_de_venta_id INT IDENTITY(1,1) PRIMARY KEY,
+    descripcion nvarchar(255)
 );
 
 CREATE TABLE QUERY_MEVAJI.medio_de_pago (
-    
+    medio_de_pago_id INT IDENTITY(1,1) PRIMARY KEY,
+    descripcion nvarchar(255)
 );
 
 
 CREATE TABLE QUERY_MEVAJI.agencia (
-    
+    agencia_id INT IDENTITY(1,1) PRIMARY KEY,
+    direccion nvarchar(255),
+    localidad_id INT foreign key REFERENCES QUERY_MEVAJI.localidad(localidad_id),
+    telefono nvarchar(255),
+    mail nvarchar(255),
+    nro_agencia BIGINT
 );
 
 CREATE TABLE QUERY_MEVAJI.agente (
-    
+    agente_id INT IDENTITY(1,1) PRIMARY KEY,
+    agencia_id INT foreign key REFERENCES QUERY_MEVAJI.agencia(agencia_id),
+    legajo BIGINT,
+    nombre nvarchar(255),
+    apellido nvarchar(255),
+    dni BIGINT,
+    telefono nvarchar(255),
+    mail nvarchar(255),
+    fecha_nac DATE,
+    direccion nvarchar(255),
+    localidad_id INT foreign key REFERENCES QUERY_MEVAJI.localidad(localidad_id)
 );
 
 
 CREATE TABLE QUERY_MEVAJI.cliente (
-    
+    cliente_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre nvarchar(255),
+    apellido nvarchar(255),
+    dni BIGINT,
+    telefono nvarchar(255),
+    mail nvarchar(255),
+    fecha_nac DATE,
+    direccion nvarchar(255),
+    localidad_id INT foreign key REFERENCES QUERY_MEVAJI.localidad(localidad_id)
 );
 
 CREATE TABLE QUERY_MEVAJI.encuesta (
-    
+    encuesta_id INT IDENTITY(1,1) PRIMARY KEY,
+    cliente_id INT foreign key REFERENCES QUERY_MEVAJI.cliente(cliente_id),
+    agente_id INT foreign key REFERENCES QUERY_MEVAJI.agente(agente_id),
+    fecha DATE,
+    comentario nvarchar(max),
 );
 
 CREATE TABLE QUERY_MEVAJI.detalle_encuesta (
-    
+    encuesta_id INT,
+    aspecto_id INT,
+    puntaje INT,
+    primary key (encuesta_id, aspecto_id),
+    foreign key (encuesta_id) references QUERY_MEVAJI.encuesta(encuesta_id),
+    foreign key (aspecto_id) references QUERY_MEVAJI.aspecto(aspecto_id)
 );
 
 CREATE TABLE QUERY_MEVAJI.aspecto (
-    
+    aspecto_id INT IDENTITY(1,1) PRIMARY KEY,
+    descripcion nvarchar(255)
 );
 
 
 CREATE TABLE QUERY_MEVAJI.proveedor (
-    
+    proveedor_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre nvarchar(255),
+    telefono nvarchar(255),
+    mail nvarchar(255),
 );
 
 CREATE TABLE QUERY_MEVAJI.aerolinea (
