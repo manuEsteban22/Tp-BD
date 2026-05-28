@@ -4,4 +4,128 @@ GO
 CREATE SCHEMA QUERY_MEVAJI;
 GO
 
--- CREACION DE TABLAS
+-- CREACION DE TABLAS --
+
+CREATE TABLE QUERY_MEVAJI.provincia (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.ciudad (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.localidad (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.pais (
+   
+);
+
+
+CREATE TABLE QUERY_MEVAJI.canal_de_venta (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.medio_de_pago (
+    
+);
+
+
+CREATE TABLE QUERY_MEVAJI.agencia (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.agente (
+    
+);
+
+
+CREATE TABLE QUERY_MEVAJI.cliente (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.encuesta (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.detalle_encuesta (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.aspecto (
+    
+);
+
+
+CREATE TABLE QUERY_MEVAJI.proveedor (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.aerolinea (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.aeropuerto (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.hospedaje (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.habitacion (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.vuelo (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.excursion (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.alianza (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.propuesta (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.estado_de_propuesta (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.solicitud (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.detalle_solicitud (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.venta (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.detalle_propuesta_hospedaje (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.detalle_venta_hospedaje (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.detalle_propuesta_vuelo (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.detalle_venta_vuelo (
+    
+);
+
+CREATE TABLE QUERY_MEVAJI.detalle_venta_excursion (
+    
+);
