@@ -7,19 +7,26 @@ GO
 -- CREACION DE TABLAS --
 
 CREATE TABLE QUERY_MEVAJI.provincia (
-    
+    provincia_id INT IDENTITY(1,1) PRIMARY KEY,
+    pais_id INT foreign key REFERENCES QUERY_MEVAJI.pais(pais_id),
+    descripcion nvarchar(255)
 );
 
 CREATE TABLE QUERY_MEVAJI.ciudad (
-    
+    ciudad_id INT IDENTITY(1,1) PRIMARY KEY,
+    provincia_id INT foreign key REFERENCES QUERY_MEVAJI.provincia(provincia_id),
+    descripcion nvarchar(255)
 );
 
 CREATE TABLE QUERY_MEVAJI.localidad (
-    
+    localidad_id INT IDENTITY(1,1) PRIMARY KEY,
+    ciudad_id INT foreign key REFERENCES QUERY_MEVAJI.ciudad(ciudad_id),
+    descripcion nvarchar(255)
 );
 
 CREATE TABLE QUERY_MEVAJI.pais (
-   
+    pais_id INT IDENTITY(1,1) PRIMARY KEY,
+    descripcion nvarchar(255)
 );
 
 
@@ -87,7 +94,8 @@ CREATE TABLE QUERY_MEVAJI.excursion (
 );
 
 CREATE TABLE QUERY_MEVAJI.alianza (
-    
+    alianza_id INT IDENTITY(1,1) PRIMARY KEY,
+    descripcion nvarchar(255)
 );
 
 CREATE TABLE QUERY_MEVAJI.propuesta (
@@ -105,7 +113,8 @@ CREATE TABLE QUERY_MEVAJI.propuesta (
 );
 
 CREATE TABLE QUERY_MEVAJI.estado_de_propuesta (
-    
+    estado_id INT IDENTITY(1,1) PRIMARY KEY,
+    descripcion nvarchar(255)
 );
 
 CREATE TABLE QUERY_MEVAJI.solicitud (
