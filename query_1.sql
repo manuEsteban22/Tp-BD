@@ -121,7 +121,7 @@ CREATE TABLE QUERY_MEVAJI.Detalle_Encuesta (
     FOREIGN KEY (aspecto_id) REFERENCES QUERY_MEVAJI.Aspecto(aspecto_id)
 );
 
-CREATE TABLE QUERY_MEVAJI.Aerolinea (
+CREATE TABLE QUERY_MEVAJI.Aerolinea (            -- cargado
     aerolinea_id INT IDENTITY(1,1) PRIMARY KEY,
     nombre nvarchar(255),
     codigo nvarchar(255),
@@ -129,7 +129,7 @@ CREATE TABLE QUERY_MEVAJI.Aerolinea (
     alianza_id INT FOREIGN KEY REFERENCES QUERY_MEVAJI.Alianza(alianza_id)
 );
 
-CREATE TABLE QUERY_MEVAJI.Aeropuerto (
+CREATE TABLE QUERY_MEVAJI.Aeropuerto (                   -- cargado
     aeropuerto_id INT IDENTITY(1,1) PRIMARY KEY,
     codigo nvarchar(10),
     ciudad_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Ciudad(ciudad_id),
@@ -682,4 +682,36 @@ ALTER PROCEDURE QUERY_MEVAJI.cargar_vuelos
 AS
 BEGIN
 
-INSERT INTO 
+INSERT INTO QUERY_MEVAJI.Vuelo (aerolinea_id,aeropuesto_origen_id, aeropuerto_destino_id, 
+                                fecha_salida, horario_salida, fecha_llegada, horario_llegada,
+                                duracion, precio, incluye_carry, incluye_valija)
+
+    SELECT a.aerolinea_id, ao.aeropuerto_id, ad.aeropuerto_id, v.fecha_salida, v.horario_salida, 
+           v.fecha_llegada, v.horario_llegada, v.duracion, v.precio, v.incluye_carry, v.incluye_valija
+    FROM 
+    (
+        SELECT 
+            Aerolinea_Nombre AS aerolinea,
+            Aeropuerto_Salida_Descripcion AS aeropuerto_origen,
+            Aeropuerto_Llegada_Descripcion AS aeropuerto_destino,
+            Vuelo_Fecha_Salida AS fecha_salida,
+            Vuelo_Horario_Salida AS horario_salida,
+            Vuelo_Fecha_Llegada AS fecha_llegada,
+            Vuelo_Horario_Llegada AS horario_llegada,
+            Vuelo_Duracion AS duracion,
+            Vuelo_Precio AS precio,
+            Vuelo_Incluye_Carry AS incluye_carry,
+            Vuelo_Incluye_Valija AS incluye_valija
+        FROM
+            GD1C2026.[gd_esquema].[Maestra]            
+    ) AS v
+    JOIN QUERY_MEVAJI.Aerolinea a
+        ON a.nombre = v.aerolinea
+
+    JOIN QUERY_MEVAJI.Aeropuerto ao 
+        ON ao.descripcion = v.aeropuerto_origen
+
+    JOIN QUERY_MEVAJI.Aeropuerto ad 
+        ON ad.descripcion = v.aeropuerto_destino     
+
+    WHERE v.aerolinea IS NOT NULL
