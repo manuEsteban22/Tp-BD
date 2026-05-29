@@ -533,12 +533,18 @@ INSERT INTO QUERY_MEVAJI.Agencia (direccion, localidad_id, telefono, mail, nro_a
             Agencia_Localidad AS localidad,
             Agencia_Telefono AS telefono,
             Agencia_Mail AS mail,
-            Agencia_Nro_Agencia AS nro_agencia
+            Agencia_Nro_Agencia AS nro_agencia,
+            Agencia_Provincia AS provincia
         FROM 
             GD1C2026.[gd_esquema].[Maestra]
     )AS a
     JOIN QUERY_MEVAJI.Localidad l
-    ON l.descripcion = a.localidad
+        ON l.descripcion = a.localidad
+
+    join QUERY_MEVAJI.Provincia p
+        ON p.descripcion = a.provincia
+        AND p.provincia_id = l.provincia_id
+        
     WHERE a.nro_agencia IS NOT NULL
 
 END 

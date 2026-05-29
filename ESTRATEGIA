@@ -1,0 +1,13 @@
+
+
+
+
+
+localidad
+como las localidades se repiten a lo largo de las provincias, decidimos relacionar localidad con 
+provincia, asi funcionan como una dupla.
+
+Ventas de Propuestas
+para respetar las reglas de normalizacion creamos la entidad Venta Propuesta, para poder relacionar
+una venta con su propuesta, si correspondiese
+
