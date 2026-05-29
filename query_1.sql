@@ -168,7 +168,7 @@ CREATE TABLE QUERY_MEVAJI.Habitacion (               -- cargado
     precio_noche DECIMAL(18,2)
 );
 
-CREATE TABLE QUERY_MEVAJI.Solicitud (            
+CREATE TABLE QUERY_MEVAJI.Solicitud (            -- cargado
     solicitud_id INT IDENTITY(1,1) PRIMARY KEY,
     cliente_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Cliente(cliente_id),
     agencia_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Agencia(agencia_id),
@@ -807,4 +807,17 @@ INSERT INTO QUERY_MEVAJI.Solicitud (cliente_id, agencia_id, nro_solicitud, fecha
     WHERE s.nro_solicitud IS NOT NULL
 
 END
+GO
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_detalle_solicitudes
+AS
+BEGIN
+
+INSERT INTO QUERY_MEVAJI.Detalle_Solicitud (solicitud_id, ciudad_id, cant_dias_aprox, observaciones)
+    SELECT s.solicitud_id, c.ciudad_id, d.cant_dias_aprox, d.observaciones
+    FROM 
+    (
+        Solicitud_Nro_Solicitud AS nro_solicitud,
+        Detalle_Solicitud_Ciudad
+    )
 
