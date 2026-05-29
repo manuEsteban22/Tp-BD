@@ -595,7 +595,7 @@ INSERT INTO QUERY_MEVAJI.Cliente (nombre, apellido, dni, telefono, mail, fecha_n
     FROM
     (
         SELECT 
-            Cliente_Nombre AS cliente,
+            Cliente_Nombre AS nombre,
             Cliente_Apellido AS apellido,
             Cliente_Dni AS dni,
             Cliente_Tel AS telefono,
@@ -607,14 +607,14 @@ INSERT INTO QUERY_MEVAJI.Cliente (nombre, apellido, dni, telefono, mail, fecha_n
         FROM
             GD1C2026.[gd_esquema].[Maestra]
     ) AS c 
-    JOIN QUERY_MEJAVI.Localidad l
+    JOIN QUERY_MEVAJI.Localidad l
         ON l.descripcion = c.localidad
 
-    JOIN QUERY_MEJAVI.Provincia p 
+    JOIN QUERY_MEVAJI.Provincia p 
         ON p.descripcion = c.provincia
         AND p.provincia_id = l.provincia_id
 
-    WHERE c.cliente IS NOT NULL
+    WHERE c.nombre IS NOT NULL
 
 END
 GO
@@ -646,7 +646,7 @@ INSERT INTO QUERY_MEVAJI.Aerolinea (nombre, codigo, pais_id, alianza_id)
 END
 GO
 
-ALTER PROCEDURE QUERY_MEVAJI.cargar_aeropuertos
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_aeropuertos
 AS
 BEGIN
 
@@ -678,7 +678,7 @@ INSERT INTO QUERY_MEVAJI.Aeropuerto (codigo, ciudad_id, descripcion)
 END
 GO
 
-ALTER PROCEDURE QUERY_MEVAJI.cargar_vuelos
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_vuelos
 AS
 BEGIN
 
@@ -715,3 +715,5 @@ INSERT INTO QUERY_MEVAJI.Vuelo (aerolinea_id,aeropuesto_origen_id, aeropuerto_de
         ON ad.descripcion = v.aeropuerto_destino     
 
     WHERE v.aerolinea IS NOT NULL
+
+END

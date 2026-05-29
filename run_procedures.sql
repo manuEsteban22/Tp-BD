@@ -38,5 +38,17 @@ GO
 EXEC QUERY_MEVAJI.cargar_agencias;
 GO
 
+EXEC QUERY_MEVAJI.cargar_clientes;
+GO
+
 EXEC QUERY_MEVAJI.cargar_agentes;
+GO
+
+EXEC QUERY_MEVAJI.cargar_aerolineas;
+GO
+
+EXEC QUERY_MEVAJI.cargar_aeropuertos;
+GO
+
+EXEC QUERY_MEVAJI.cargar_vuelos;
 GO
