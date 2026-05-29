@@ -773,5 +773,38 @@ INSERT INTO QUERY_MEVAJI.Habitacion (hospedaje_id, nombre, descripcion, precio_n
 END
 GO
 
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_solicitudes
+AS
+BEGIN
 
+INSERT INTO QUERY_MEVAJI.Solicitud (cliente_id, agencia_id, nro_solicitud, fecha_solicitud, fecha_inicio_tentativa, 
+                            fecha_fin_tentativa, cant_pax, observaciones, presupuesto_estimado)
+    SELECT s.cliente_id, s.agencia_id, s.nro_solicitud, s.fecha_solicitud, s.fecha_inicio_tentativa,
+           s.fecha_fin_tentativa, s.cant_pax, s.observaciones, s.presupuesto_estimado
+    FROM
+    (
+        SELECT 
+            Cliente_Dni AS cliente_dni,
+            Cliente_Nombre AS cliente_nombre,
+            Agencia_Nro_Agencia AS agencia_nro,
+            Solicitud_Nro_Solicitud AS nro_solicitud,
+            Solicitud_Fecha_Solicitud AS fecha_solicitud,
+            Solicitud_Fecha_Inicio_Tentativa AS fecha_inicio_tentativa,
+            Solicitud_Fecha_Fin_Tentativa AS fecha_fin_tentativa,
+            Solicitud_Cant_Pax AS cant_pax,
+            Solicitud_Observaciones AS observaciones,
+            Solicitud_Presupuesto_Estimado AS presupuesto_estimado
+        FROM
+            GD1C2026.[gd_esquema].[Maestra]
+    ) AS s
+    JOIN QUERY_MEVAJI.Cliente c
+        ON c.dni = s.cliente_dni
+        AND c.nombre = s.cliente_nombre
+
+    JOIN QUERY_MEVAJI.Agencia a
+        ON a.nro_agencia = s.agencia_nro
+
+    WHERE s.nro_solicitud IS NOT NULL
+
+END
 
