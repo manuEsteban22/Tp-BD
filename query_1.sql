@@ -584,3 +584,33 @@ INSERT INTO QUERY_MEVAJI.Agente (agencia_id, legajo,nombre, apellido, dni, telef
     WHERE a.dni IS NOT NULL
 
 END
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_clientes
+AS
+BEGIN
+
+INSERT INTO QUERY_MEVAJI.Cliente (nombre, apellido, dni, telefono, mail, fecha_nac, direccion, localidad_id)
+    SELECT c.nombre, c.apellido, c.dni, c.telefono, c.mail, c.fecha_nac, c.direccion, l.localidad_id
+    FROM
+    (
+        SELECT 
+            Cliente_Nombre AS cliente,
+            Cliente_Apellido AS apellido,
+            Cliente_Dni AS dni,
+            Cliente_Telefono AS telefono,
+            Cliente_Mail AS mail,
+            Cliente_Fecha_Nac AS fecha_nac,
+            Cliente_Direccion AS direccion,
+            Cliente_Localidad AS localidad,
+            Cliente_Provincia AS provincia
+        FROM
+            GD1C2026.[gd_esquema].[Maestra]
+    ) AS c 
+    JOIN QUERY_MEJAVI.Localidad l
+        ON l.descripcion = c.localidad
+    JOIN QUERY_MEJAVI.Provincia p 
+        ON p.descripcion = c.provincia
+        AND p.provincia_id = l.provincia_id
+    WHERE c.cliente IS NOT NULL
+
+END
