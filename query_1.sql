@@ -584,6 +584,7 @@ INSERT INTO QUERY_MEVAJI.Agente (agencia_id, legajo,nombre, apellido, dni, telef
     WHERE a.dni IS NOT NULL
 
 END
+GO
 
 CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_clientes
 AS
@@ -597,7 +598,7 @@ INSERT INTO QUERY_MEVAJI.Cliente (nombre, apellido, dni, telefono, mail, fecha_n
             Cliente_Nombre AS cliente,
             Cliente_Apellido AS apellido,
             Cliente_Dni AS dni,
-            Cliente_Telefono AS telefono,
+            Cliente_Tel AS telefono,
             Cliente_Mail AS mail,
             Cliente_Fecha_Nac AS fecha_nac,
             Cliente_Direccion AS direccion,
@@ -616,6 +617,7 @@ INSERT INTO QUERY_MEVAJI.Cliente (nombre, apellido, dni, telefono, mail, fecha_n
     WHERE c.cliente IS NOT NULL
 
 END
+GO
 
 CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_aerolineas
 AS
@@ -642,6 +644,7 @@ INSERT INTO QUERY_MEVAJI.Aerolinea (nombre, codigo, pais_id, alianza_id)
     WHERE a.nombre IS NOT NULL
 
 END
+GO
 
 ALTER PROCEDURE QUERY_MEVAJI.cargar_aeropuertos
 AS
@@ -652,51 +655,4 @@ INSERT INTO QUERY_MEVAJI.Aeropuerto (codigo, ciudad_id, descripcion)
     FROM
     (
         SELECT 
-            Aeropuerto_Codigo AS codigo,
-            Aeropuerto_Ciudad AS ciudad,
-            Aeropuerto_Descripcion AS descripcion
-        FROM 
-            GD1C2026.[gd_esquema].[Maestra]
-    ) AS a
-    JOIN QUERY_MEVAJI.Ciudad c
-        ON c.descripcion = a.ciudad
-
-    WHERE a.codigo IS NOT NULL
-
-END
-
-ALTER PROCEDURE QUERY_MEVAJI.cargar_vuelos
-AS
-BEGIN
-
-INSERT INTO QUERY_MEVAJI.Vuelo (aerolinea_id, aeropuesto_origen_id, aeropuerto_destino_id, fecha_salida, horario_salida, fecha_llegada, horario_llegada, duracion, precio, incluye_carry, incluye_valija)
-    SELECT DISTINCT v.aerolinea_id, v.aeropuerto_origen_id, v.aeropuerto_destino_id, v.fecha_salida, v.horario_salida, v.fecha_llegada, v.horario_llegada, v.duracion, v.precio, v.incluye_carry, v.incluye_valija
-    FROM
-    (
-        SELECT 
-            Aerolinea_Nombre AS aerolinea,
-            Aeropuerto_Salida_Codigo AS aeropuerto_origen,
-            Aeropuerto_Llegada_Codigo AS aeropuerto_destino,
-            Vuelo_Fecha_Salida AS fecha_salida,
-            Vuelo_Horario_Salida AS horario_salida,
-            Vuelo_Fecha_Llegada AS fecha_llegada,
-            Vuelo_Horario_Llegada AS horario_llegada,
-            Vuelo_Duracion AS duracion,
-            Vuelo_Precio AS precio,
-            Vuelo_Incluye_Carry AS incluye_carry,
-            Vuelo_Incluye_Valija AS incluye_valija
-        FROM 
-            GD1C2026.[gd_esquema].[Maestra]
-    ) AS v
-    JOIN QUERY_MEVAJI.Aerolinea a
-        ON a.nombre = v.aerolinea
-
-    JOIN QUERY_MEVAJI.Aeropuerto ap_origen
-        ON ap_origen.codigo = v.aeropuerto_origen
-
-    JOIN QUERY_MEVAJI.Aeropuerto ap_destino
-        ON ap_destino.codigo = v.aeropuerto_destino
-
-    WHERE v.aerolinea IS NOT NULL
-
-END
+ 
