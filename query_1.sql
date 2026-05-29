@@ -816,8 +816,20 @@ BEGIN
 INSERT INTO QUERY_MEVAJI.Detalle_Solicitud (solicitud_id, ciudad_id, cant_dias_aprox, observaciones)
     SELECT s.solicitud_id, c.ciudad_id, d.cant_dias_aprox, d.observaciones
     FROM 
-    (
-        Solicitud_Nro_Solicitud AS nro_solicitud,
-        Detalle_Solicitud_Ciudad
-    )
+    (   
+        SELECT
+            Solicitud_Nro_Solicitud AS nro_solicitud,
+            Detalle_Solicitud_Ciudad AS soli_ciudad,
+            Detalle_Solicitud_Cant_Dias_Aprox AS cant_dias_aprox,
+            Detalle_Solicitud_Observaciones AS observaciones
+        FROM
+            GD1C2026.[gd_esquema].[Maestra]
+    ) AS d 
+    JOIN QUERY_MEVAJI.Solicitud s
+        ON s.nro_solicitud = d.nro_solicitud
+    
+    JOIN QUERY_MEVAJI.Ciudad c
+        ON c.descripcion = d.soli_ciudad
+    
+    WHERE d.nro_solicitud IS NOT NULL
 
