@@ -31,7 +31,7 @@ CREATE TABLE QUERY_MEVAJI.Alianza (                -- cargado
     descripcion nvarchar(255)
 );
 
-CREATE TABLE QUERY_MEVAJI.Proveedor (
+CREATE TABLE QUERY_MEVAJI.Proveedor (               -- cargado
     proveedor_id INT IDENTITY(1,1) PRIMARY KEY,
     nombre nvarchar(255),
     telefono nvarchar(255),
@@ -423,9 +423,46 @@ GO
 
 
 
---CREATE OR ALTER PROCEDURE QUERY_MEVAJI.
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_proveedor
+AS
+BEGIN 
+
+INSERT INTO QUERY_MEVAJI.Proveedor (nombre, telefono, mail)
+    SELECT DISTINCT p.nombre, p.telefono, p.mail
+    FROM
+    (
+        SELECT 
+            Proveedor_Nombre AS nombre, 
+            Proveedor_Mail AS mail, 
+            Proveedor_Telefono AS telefono
+        FROM 
+            GD1C2026.[gd_esquema].[Maestra]
+    ) AS p
+    WHERE nombre IS NOT NULL
+
+END
+GO
 
 
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_excursiones
+AS
+BEGIN
 
---CREATE OR ALTER PROCEDURE QUERY_MEVAJI.
+INSERT INTO QUERY_MEVAJI.Excursion (nombre, descripcion, horario, duracion, precio)
+    SELECT DISTINCT e.nombre, e.descripcion, e.horario, e.duracion, e.precio
+    FROM
+    (
+        SELECT 
+            Excursion_Nombre as nombre,
+            Excursion_Descripcion as descripcion,
+            Excursion_Horario as horario,
+            Excursion_Duracion as duracion,
+            Excursion_Precio as precio
+        FROM
+            GD1C2026.[gd_esquema].[Maestra]
+    ) AS e
+    WHERE nombre IS NOT NULL
+
+END
+GO
 
