@@ -655,4 +655,31 @@ INSERT INTO QUERY_MEVAJI.Aeropuerto (codigo, ciudad_id, descripcion)
     FROM
     (
         SELECT 
- 
+            Aeropuerto_Salida_Codigo AS codigo,
+            Aeropuerto_Salida_Ciudad AS ciudad,
+            Aeropuerto_Salida_Descripcion AS descripcion
+        FROM 
+            GD1C2026.[gd_esquema].[Maestra]
+
+        UNION
+
+        SELECT 
+            Aeropuerto_Llegada_Codigo AS codigo,
+            Aeropuerto_Llegada_Ciudad AS ciudad,
+            Aeropuerto_Llegada_Descripcion AS descripcion
+        FROM 
+            GD1C2026.[gd_esquema].[Maestra]
+    ) AS a
+    JOIN QUERY_MEVAJI.Ciudad c
+        ON c.descripcion = a.ciudad
+
+    WHERE a.codigo IS NOT NULL
+
+END
+GO
+
+ALTER PROCEDURE QUERY_MEVAJI.cargar_vuelos
+AS
+BEGIN
+
+INSERT INTO 
