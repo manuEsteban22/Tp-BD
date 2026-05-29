@@ -78,7 +78,7 @@ CREATE TABLE QUERY_MEVAJI.Agencia (              -- cargado
     nro_agencia BIGINT
 );
 
-CREATE TABLE QUERY_MEVAJI.Agente (
+CREATE TABLE QUERY_MEVAJI.Agente (            -- cargado
     agente_id INT IDENTITY(1,1) PRIMARY KEY,
     agencia_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Agencia(agencia_id),
     legajo BIGINT,
@@ -544,7 +544,7 @@ INSERT INTO QUERY_MEVAJI.Agencia (direccion, localidad_id, telefono, mail, nro_a
     join QUERY_MEVAJI.Provincia p
         ON p.descripcion = a.provincia
         AND p.provincia_id = l.provincia_id
-        
+
     WHERE a.nro_agencia IS NOT NULL
 
 END 
@@ -567,14 +567,20 @@ INSERT INTO QUERY_MEVAJI.Agente (agencia_id, legajo,nombre, apellido, dni, telef
             Agente_Mail AS mail,
             Agente_Fecha_Nac AS fecha_nac,
             Agente_Direccion AS direccion,
-            Agente_Localidad AS localidad
+            Agente_Localidad AS localidad,
+            Agente_Provincia AS provincia
         FROM 
             GD1C2026.[gd_esquema].[Maestra]
     )AS a
     JOIN QUERY_MEVAJI.Localidad l
-    ON l.descripcion = a.localidad
+        ON l.descripcion = a.localidad
+
+    Join QUERY_MEVAJI.Provincia p
+        ON p.descripcion = a.provincia
+        AND p.provincia_id = l.provincia_id
+
     JOIN QUERY_MEVAJI.Agencia ag
-    ON ag.localidad_id = l.localidad_id
+        ON ag.localidad_id = l.localidad_id
     WHERE a.dni IS NOT NULL
 
 END
