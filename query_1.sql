@@ -312,3 +312,30 @@ INSERT INTO QUERY_MEVAJI.Pais (descripcion)
 
 END
 GO
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_ciudades
+AS
+BEGIN
+
+INSERT INTO QUERY_MEVAJI.Ciudad (pais_id, descripcion)
+    SELECT DISTINCT c.ciudad, p.pais_id
+    FROM
+    (
+        SELECT Aeropuerto_Salida_Ciudad AS ciudad, Aeropuerto_Salida_Pais AS pais
+        FROM GD1C2026.[gd_esquema].[Maestra]
+
+        UNION 
+
+        SELECT Aeropuerto_Llegada_Ciudad AS ciudad, Aeropuerto_Llegada_Pais AS pais
+        FROM GD1C2026.[gd_esquema].[Maestra]
+
+        UNION 
+
+        SELECT Hospedaje_Ciudad AS ciudad, Hospedaje_Pais AS pais
+        FROM GD1C2026.[gd_esquema].[Maestra]
+    ) AS c
+    JOIN QUERY_MEVAJI.Pais p
+        ON p.descripcion = c.pais
+    WHERE ciudad IS NOT NULL
+    
+END
