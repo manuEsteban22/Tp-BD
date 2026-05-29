@@ -38,7 +38,7 @@ CREATE TABLE QUERY_MEVAJI.Proveedor (               -- cargado
     mail nvarchar(255)
 );
 
-CREATE TABLE QUERY_MEVAJI.Excursion (
+CREATE TABLE QUERY_MEVAJI.Excursion (                -- cargado
     excursion_id INT IDENTITY(1,1) PRIMARY KEY,
     nombre nvarchar(255),
     descripcion nvarchar(255),
@@ -52,7 +52,7 @@ CREATE TABLE QUERY_MEVAJI.Estado_De_Propuesta (                 -- cargado
     descripcion nvarchar(255)
 );
 
-CREATE TABLE QUERY_MEVAJI.Provincia (
+CREATE TABLE QUERY_MEVAJI.Provincia (                      -- cargado
     provincia_id INT IDENTITY(1,1) PRIMARY KEY,
     descripcion nvarchar(255)
 );
@@ -63,13 +63,13 @@ CREATE TABLE QUERY_MEVAJI.Ciudad (               -- cargado
     descripcion nvarchar(255)
 );
 
-CREATE TABLE QUERY_MEVAJI.Localidad (
+CREATE TABLE QUERY_MEVAJI.Localidad (              -- cargado
     localidad_id INT IDENTITY(1,1) PRIMARY KEY,
     provincia_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Provincia(provincia_id),
     descripcion nvarchar(255)
 );
 
-CREATE TABLE QUERY_MEVAJI.Agencia (
+CREATE TABLE QUERY_MEVAJI.Agencia (              -- cargado
     agencia_id INT IDENTITY(1,1) PRIMARY KEY,
     direccion nvarchar(255),
     localidad_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Localidad(localidad_id),
@@ -316,7 +316,7 @@ AS
 BEGIN
 
 INSERT INTO QUERY_MEVAJI.Ciudad (pais_id, descripcion)
-    SELECT DISTINCT c.ciudad, p.pais_id
+    SELECT DISTINCT p.pais_id, c.ciudad
     FROM
     (
         SELECT Aeropuerto_Salida_Ciudad AS ciudad, Aeropuerto_Salida_Pais AS pais
@@ -466,3 +466,109 @@ INSERT INTO QUERY_MEVAJI.Excursion (nombre, descripcion, horario, duracion, prec
 END
 GO
 
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_provincias
+AS
+BEGIN
+
+INSERT INTO QUERY_MEVAJI.Provincia (descripcion)
+    SELECT DISTINCT p.provincia
+    FROM
+    (
+        SELECT Agencia_Provincia AS provincia
+        FROM GD1C2026.[gd_esquema].[Maestra]
+
+        UNION 
+
+        SELECT Agente_Provincia AS provincia
+        FROM GD1C2026.[gd_esquema].[Maestra]
+
+        UNION 
+
+        SELECT Cliente_Provincia AS provincia
+        FROM GD1C2026.[gd_esquema].[Maestra]
+    ) AS p 
+    WHERE provincia IS NOT NULL
+
+END 
+GO
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_localidades
+AS
+BEGIN
+
+INSERT INTO QUERY_MEVAJI.Localidad (provincia_id, descripcion)
+    SELECT DISTINCT p.provincia_id, l.localidad
+    FROM
+    (
+        SELECT  Agencia_Provincia AS provincia, Agencia_Localidad AS localidad
+        FROM [gd_esquema].[Maestra]
+
+        UNION 
+
+        SELECT  Agente_Provincia AS provincia, Agente_Localidad AS localidad
+        FROM [gd_esquema].[Maestra]
+
+        UNION 
+
+        SELECT  Cliente_Provincia AS provincia, Cliente_Localidad AS localidad
+        FROM [gd_esquema].[Maestra]
+    ) AS l
+    JOIN QUERY_MEVAJI.Provincia p
+    ON p.descripcion = l.provincia
+    WHERE localidad IS NOT NULL
+
+END
+GO
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_agencias
+AS
+BEGIN
+
+INSERT INTO QUERY_MEVAJI.Agencia (direccion, localidad_id, telefono, mail, nro_agencia)
+    SELECT DISTINCT a.direccion, l.localidad_id, a.telefono, a.mail, a.nro_agencia
+    FROM 
+    (
+        SELECT 
+            Agencia_Direccion AS direccion,
+            Agencia_Localidad AS localidad,
+            Agencia_Telefono AS telefono,
+            Agencia_Mail AS mail,
+            Agencia_Nro_Agencia AS nro_agencia
+        FROM 
+            GD1C2026.[gd_esquema].[Maestra]
+    )AS a
+    JOIN QUERY_MEVAJI.Localidad l
+    ON l.descripcion = a.localidad
+    WHERE a.nro_agencia IS NOT NULL
+
+END 
+GO
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_agentes
+AS 
+BEGIN 
+
+INSERT INTO QUERY_MEVAJI.Agente (agencia_id, legajo,nombre, apellido, dni, telefono, mail, fecha_nac, direccion, localidad_id)
+    SELECT DISTINCT ag.agencia_id,a.legajo, a.nombre, a.apellido, a.dni, a.telefono, a.mail, a.fecha_nac, a.direccion, l.localidad_id
+    FROM 
+    (
+        SELECT 
+            Agente_Legajo AS legajo,
+            Agente_Nombre AS nombre,
+            Agente_Apellido AS apellido,
+            Agente_DNI AS dni,
+            Agente_Telefono AS telefono,
+            Agente_Mail AS mail,
+            Agente_Fecha_Nac AS fecha_nac,
+            Agente_Direccion AS direccion,
+            Agente_Localidad AS localidad
+        FROM 
+            GD1C2026.[gd_esquema].[Maestra]
+    )AS a
+    JOIN QUERY_MEVAJI.Localidad l
+    ON l.descripcion = a.localidad
+    JOIN QUERY_MEVAJI.Agencia ag
+    ON ag.localidad_id = l.localidad_id
+    WHERE a.dni IS NOT NULL
+
+END
