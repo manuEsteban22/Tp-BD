@@ -5,7 +5,6 @@ GO
 --GO
 
 -- CREACION DE TABLAS --
--- Orden: primero tablas maestras sin dependencias, luego las que dependen de ellas
 
 CREATE TABLE QUERY_MEVAJI.Pais (
     pais_id INT IDENTITY(1,1) PRIMARY KEY,
