@@ -151,7 +151,7 @@ CREATE TABLE QUERY_MEVAJI.Vuelo (                -- cargado
     incluye_valija BIT
 );
 
-CREATE TABLE QUERY_MEVAJI.Hospedaje (
+CREATE TABLE QUERY_MEVAJI.Hospedaje (            -- cargado
     hospedaje_id INT IDENTITY(1,1) PRIMARY KEY,
     ciudad_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Ciudad(ciudad_id),
     nombre nvarchar(255),
@@ -160,7 +160,7 @@ CREATE TABLE QUERY_MEVAJI.Hospedaje (
     check_out TIME
 );
 
-CREATE TABLE QUERY_MEVAJI.Habitacion (
+CREATE TABLE QUERY_MEVAJI.Habitacion (               -- cargado
     habitacion_id INT IDENTITY(1,1) PRIMARY KEY,
     hospedaje_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Hospedaje(hospedaje_id),
     nombre nvarchar(255),
@@ -168,7 +168,7 @@ CREATE TABLE QUERY_MEVAJI.Habitacion (
     precio_noche DECIMAL(18,2)
 );
 
-CREATE TABLE QUERY_MEVAJI.Solicitud (
+CREATE TABLE QUERY_MEVAJI.Solicitud (            
     solicitud_id INT IDENTITY(1,1) PRIMARY KEY,
     cliente_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Cliente(cliente_id),
     agencia_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Agencia(agencia_id),
@@ -205,7 +205,6 @@ CREATE TABLE QUERY_MEVAJI.Propuesta (
 
 CREATE TABLE QUERY_MEVAJI.Venta (
     venta_id INT IDENTITY(1,1) PRIMARY KEY,
-    propuesta_id INT FOREIGN KEY REFERENCES QUERY_MEVAJI.Propuesta(propuesta_id),
     cliente_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Cliente(cliente_id),
     nro_venta BIGINT,
     canal_de_venta_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Canal_De_Venta(canal_de_venta_id),
@@ -214,6 +213,12 @@ CREATE TABLE QUERY_MEVAJI.Venta (
     subtotal DECIMAL(18,2),
     descuento DECIMAL(18,2),
     importe_total DECIMAL(18,2)
+);
+
+CREATE TABLE QUERY_MEVAJI.Propuesta_Ventas (
+    propuesta_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Propuesta(propuesta_id),
+    venta_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Venta(venta_id),
+    PRIMARY KEY (propuesta_id, venta_id)
 );
 
 CREATE TABLE QUERY_MEVAJI.Detalle_Propuesta_Hospedaje (
@@ -766,3 +771,7 @@ INSERT INTO QUERY_MEVAJI.Habitacion (hospedaje_id, nombre, descripcion, precio_n
     WHERE ha.nombre IS NOT NULL
 
 END
+GO
+
+
+
