@@ -2,31 +2,31 @@ USE [GD1C2026]
 GO
 
 --CREATE SCHEMA QUERY_MEVAJI;
---GO
+GO
 
 -- CREACION DE TABLAS --
 
-CREATE TABLE QUERY_MEVAJI.Pais (
+CREATE TABLE QUERY_MEVAJI.Pais (                         -- cargado
     pais_id INT IDENTITY(1,1) PRIMARY KEY,
     descripcion nvarchar(255)
 );
 
-CREATE TABLE QUERY_MEVAJI.Canal_De_Venta (
+CREATE TABLE QUERY_MEVAJI.Canal_De_Venta (                  -- cargado
     canal_de_venta_id INT IDENTITY(1,1) PRIMARY KEY,
     descripcion nvarchar(255)
 );
 
-CREATE TABLE QUERY_MEVAJI.Medio_De_Pago (
+CREATE TABLE QUERY_MEVAJI.Medio_De_Pago (                 -- cargado
     medio_de_pago_id INT IDENTITY(1,1) PRIMARY KEY,
     descripcion nvarchar(255)
 );
 
-CREATE TABLE QUERY_MEVAJI.Aspecto (
+CREATE TABLE QUERY_MEVAJI.Aspecto (                    --- cargado
     aspecto_id INT IDENTITY(1,1) PRIMARY KEY,
     descripcion nvarchar(255)
 );
 
-CREATE TABLE QUERY_MEVAJI.Alianza (
+CREATE TABLE QUERY_MEVAJI.Alianza (                -- cargado
     alianza_id INT IDENTITY(1,1) PRIMARY KEY,
     descripcion nvarchar(255)
 );
@@ -47,26 +47,25 @@ CREATE TABLE QUERY_MEVAJI.Excursion (
     precio DECIMAL(18,2)
 );
 
-CREATE TABLE QUERY_MEVAJI.Estado_De_Propuesta (
+CREATE TABLE QUERY_MEVAJI.Estado_De_Propuesta (                 -- cargado
     estado_id INT IDENTITY(1,1) PRIMARY KEY,
     descripcion nvarchar(255)
 );
 
 CREATE TABLE QUERY_MEVAJI.Provincia (
     provincia_id INT IDENTITY(1,1) PRIMARY KEY,
-    pais_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Pais(pais_id),
     descripcion nvarchar(255)
 );
 
-CREATE TABLE QUERY_MEVAJI.Ciudad (
+CREATE TABLE QUERY_MEVAJI.Ciudad (               -- cargado
     ciudad_id INT IDENTITY(1,1) PRIMARY KEY,
-    provincia_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Provincia(provincia_id),
+    pais_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Pais(pais_id),
     descripcion nvarchar(255)
 );
 
 CREATE TABLE QUERY_MEVAJI.Localidad (
     localidad_id INT IDENTITY(1,1) PRIMARY KEY,
-    ciudad_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Ciudad(ciudad_id),
+    provincia_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Provincia(provincia_id),
     descripcion nvarchar(255)
 );
 
@@ -338,3 +337,95 @@ INSERT INTO QUERY_MEVAJI.Ciudad (pais_id, descripcion)
     WHERE ciudad IS NOT NULL
     
 END
+GO
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_canal_de_venta
+AS
+BEGIN
+
+INSERT INTO QUERY_MEVAJI.Canal_De_Venta (descripcion)
+    SELECT DISTINCT m.canal
+    FROM
+    (
+        SELECT Venta_Canal_Venta as canal
+        FROM GD1C2026.[gd_esquema].[Maestra]
+    ) m 
+    WHERE canal IS NOT NULL
+
+END
+GO
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_medio_de_pago
+AS
+BEGIN 
+
+INSERT INTO QUERY_MEVAJI.Medio_De_Pago (descripcion)
+    SELECT DISTINCT m.medio
+    FROM
+    (
+        SELECT Venta_Medio_Pago as medio
+        FROM GD1C2026.[gd_esquema].[Maestra]
+    ) m 
+    WHERE medio IS NOT NULL
+
+END
+GO
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_aspecto
+AS
+BEGIN 
+
+INSERT INTO QUERY_MEVAJI.Aspecto (descripcion)
+    SELECT DISTINCT a.aspecto
+    FROM
+    (
+        SELECT Aspecto_Aspecto as aspecto
+        FROM GD1C2026.[gd_esquema].[Maestra]
+    ) a
+    WHERE aspecto IS NOT NULL
+
+END
+GO
+
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_alianza
+AS
+BEGIN 
+
+INSERT INTO QUERY_MEVAJI.Medio_De_Pago (descripcion)
+    SELECT DISTINCT a.alianza
+    FROM
+    (
+        SELECT Aerolinea_Alianza as alianza
+        FROM GD1C2026.[gd_esquema].[Maestra]
+    ) a
+    WHERE alianza IS NOT NULL
+
+END
+GO
+
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_estado_propuesta
+AS
+BEGIN 
+
+INSERT INTO QUERY_MEVAJI.Estado_De_Propuesta (descripcion)
+    SELECT DISTINCT m.estado
+    FROM
+    (
+        SELECT Propuesta_Estado as estado
+        FROM GD1C2026.[gd_esquema].[Maestra]
+    ) m 
+    WHERE estado IS NOT NULL
+
+END
+GO
+
+
+
+--CREATE OR ALTER PROCEDURE QUERY_MEVAJI.
+
+
+
+--CREATE OR ALTER PROCEDURE QUERY_MEVAJI.
+
