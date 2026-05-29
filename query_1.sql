@@ -92,7 +92,7 @@ CREATE TABLE QUERY_MEVAJI.Agente (            -- cargado
     localidad_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Localidad(localidad_id)
 );
 
-CREATE TABLE QUERY_MEVAJI.Cliente (
+CREATE TABLE QUERY_MEVAJI.Cliente (             -- cargado
     cliente_id INT IDENTITY(1,1) PRIMARY KEY,
     nombre nvarchar(255),
     apellido nvarchar(255),
@@ -608,9 +608,95 @@ INSERT INTO QUERY_MEVAJI.Cliente (nombre, apellido, dni, telefono, mail, fecha_n
     ) AS c 
     JOIN QUERY_MEJAVI.Localidad l
         ON l.descripcion = c.localidad
+
     JOIN QUERY_MEJAVI.Provincia p 
         ON p.descripcion = c.provincia
         AND p.provincia_id = l.provincia_id
+
     WHERE c.cliente IS NOT NULL
+
+END
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_aerolineas
+AS
+BEGIN
+
+INSERT INTO QUERY_MEVAJI.Aerolinea (nombre, codigo, pais_id, alianza_id)
+    SELECT DISTINCT a.nombre, a.codigo, p.pais_id, al.alianza_id
+    FROM
+    (
+        SELECT 
+            Aerolinea_Nombre AS nombre,
+            Aerolinea_Codigo AS codigo,
+            Aerolinea_Pais AS pais,
+            Aerolinea_Alianza AS alianza
+        FROM 
+            GD1C2026.[gd_esquema].[Maestra]
+    ) AS a
+    JOIN QUERY_MEVAJI.Pais p
+        ON p.descripcion = a.pais
+
+    LEFT JOIN QUERY_MEVAJI.Alianza al
+        ON al.descripcion = a.alianza
+
+    WHERE a.nombre IS NOT NULL
+
+END
+
+ALTER PROCEDURE QUERY_MEVAJI.cargar_aeropuertos
+AS
+BEGIN
+
+INSERT INTO QUERY_MEVAJI.Aeropuerto (codigo, ciudad_id, descripcion)
+    SELECT DISTINCT a.codigo, c.ciudad_id, a.descripcion
+    FROM
+    (
+        SELECT 
+            Aeropuerto_Codigo AS codigo,
+            Aeropuerto_Ciudad AS ciudad,
+            Aeropuerto_Descripcion AS descripcion
+        FROM 
+            GD1C2026.[gd_esquema].[Maestra]
+    ) AS a
+    JOIN QUERY_MEVAJI.Ciudad c
+        ON c.descripcion = a.ciudad
+
+    WHERE a.codigo IS NOT NULL
+
+END
+
+ALTER PROCEDURE QUERY_MEVAJI.cargar_vuelos
+AS
+BEGIN
+
+INSERT INTO QUERY_MEVAJI.Vuelo (aerolinea_id, aeropuesto_origen_id, aeropuerto_destino_id, fecha_salida, horario_salida, fecha_llegada, horario_llegada, duracion, precio, incluye_carry, incluye_valija)
+    SELECT DISTINCT v.aerolinea_id, v.aeropuerto_origen_id, v.aeropuerto_destino_id, v.fecha_salida, v.horario_salida, v.fecha_llegada, v.horario_llegada, v.duracion, v.precio, v.incluye_carry, v.incluye_valija
+    FROM
+    (
+        SELECT 
+            Aerolinea_Nombre AS aerolinea,
+            Aeropuerto_Salida_Codigo AS aeropuerto_origen,
+            Aeropuerto_Llegada_Codigo AS aeropuerto_destino,
+            Vuelo_Fecha_Salida AS fecha_salida,
+            Vuelo_Horario_Salida AS horario_salida,
+            Vuelo_Fecha_Llegada AS fecha_llegada,
+            Vuelo_Horario_Llegada AS horario_llegada,
+            Vuelo_Duracion AS duracion,
+            Vuelo_Precio AS precio,
+            Vuelo_Incluye_Carry AS incluye_carry,
+            Vuelo_Incluye_Valija AS incluye_valija
+        FROM 
+            GD1C2026.[gd_esquema].[Maestra]
+    ) AS v
+    JOIN QUERY_MEVAJI.Aerolinea a
+        ON a.nombre = v.aerolinea
+
+    JOIN QUERY_MEVAJI.Aeropuerto ap_origen
+        ON ap_origen.codigo = v.aeropuerto_origen
+
+    JOIN QUERY_MEVAJI.Aeropuerto ap_destino
+        ON ap_destino.codigo = v.aeropuerto_destino
+
+    WHERE v.aerolinea IS NOT NULL
 
 END
