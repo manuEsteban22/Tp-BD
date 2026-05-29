@@ -136,7 +136,7 @@ CREATE TABLE QUERY_MEVAJI.Aeropuerto (                   -- cargado
     descripcion nvarchar(255)
 );
 
-CREATE TABLE QUERY_MEVAJI.Vuelo (
+CREATE TABLE QUERY_MEVAJI.Vuelo (                -- cargado
     vuelo_id INT IDENTITY(1,1) PRIMARY KEY,
     aerolinea_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Aerolinea(aerolinea_id),
     aeropuesto_origen_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Aeropuerto(aeropuerto_id),
@@ -715,5 +715,54 @@ INSERT INTO QUERY_MEVAJI.Vuelo (aerolinea_id,aeropuesto_origen_id, aeropuerto_de
         ON ad.descripcion = v.aeropuerto_destino     
 
     WHERE v.aerolinea IS NOT NULL
+
+END
+GO
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_hospedajes
+AS
+BEGIN
+
+INSERT INTO QUERY_MEVAJI.Hospedaje (ciudad_id, nombre, incluye_desayuno, check_in, check_out)
+    SELECT DISTINCT c.ciudad_id, h.nombre, h.incluye_desayuno, h.check_in, h.check_out
+    FROM
+    (
+        SELECT 
+            Hospedaje_Ciudad AS ciudad,
+            Hospedaje_Nombre AS nombre,
+            Hospedaje_Incluye_Desayuno AS incluye_desayuno,
+            Hospedaje_Check_In AS check_in,
+            Hospedaje_Check_Out AS check_out
+        FROM
+            GD1C2026.[gd_esquema].[Maestra]
+    ) AS h
+    JOIN QUERY_MEVAJI.Ciudad c
+        ON c.descripcion = h.ciudad
+
+    WHERE h.nombre IS NOT NULL
+
+END
+GO
+
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_habitaciones
+AS
+BEGIN
+
+INSERT INTO QUERY_MEVAJI.Habitacion (hospedaje_id, nombre, descripcion, precio_noche)
+    SELECT DISTINCT h.hospedaje_id, ha.nombre, ha.descripcion, ha.precio_noche
+    FROM
+    (
+        SELECT 
+            Hospedaje_Nombre AS hospedaje,
+            Habitacion_Nombre AS nombre,
+            Habitacion_Descripcion AS descripcion,
+            Habitacion_Precio_Noche AS precio_noche
+        FROM
+            GD1C2026.[gd_esquema].[Maestra]
+    ) AS ha
+    JOIN QUERY_MEVAJI.Hospedaje h
+        ON h.nombre = ha.hospedaje
+
+    WHERE ha.nombre IS NOT NULL
 
 END
