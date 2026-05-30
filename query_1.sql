@@ -193,6 +193,7 @@ CREATE TABLE QUERY_MEVAJI.Propuesta ( -- CARGADO
     propuesta_id INT IDENTITY(1,1) PRIMARY KEY,
     solicitud_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Solicitud(solicitud_id),
     agente_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Agente(agente_id),
+    nro_propuesta BIGINT,
     fecha_emision DATE,
     vigencia_hasta DATE,
     fecha_desde DATE,
@@ -215,13 +216,13 @@ CREATE TABLE QUERY_MEVAJI.Venta ( -- CARGADO
     importe_total DECIMAL(18,2)
 );
 
-CREATE TABLE QUERY_MEVAJI.Propuesta_Ventas (
+CREATE TABLE QUERY_MEVAJI.Propuesta_Ventas ( -- CARGADO 
     propuesta_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Propuesta(propuesta_id),
     venta_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Venta(venta_id),
     PRIMARY KEY (propuesta_id, venta_id)
 );
 
-CREATE TABLE QUERY_MEVAJI.Detalle_Propuesta_Hospedaje (
+CREATE TABLE QUERY_MEVAJI.Detalle_Propuesta_Hospedaje ( --CARGADO
     propuesta_id INT NOT NULL,
     habitacion_id INT NOT NULL,
     fecha_desde DATE,
@@ -841,12 +842,13 @@ GO
 CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_propuestas 
 AS  
 BEGIN
-insert into QUERY_MEVAJI.Propuesta (solicitud_id, agente_id, fecha_emision, vigencia_hasta, fecha_desde, fecha_hasta, subtotal, descuento, importe_total, estado)
-select s.solicitud_id, a.agente_id, p.fecha_emision, p.vigencia_hasta, p.fecha_desde, p.fecha_hasta, p.subtotal, p.descuento, p.importe_total, p.estado
+insert into QUERY_MEVAJI.Propuesta (solicitud_id, agente_id, nro_propuesta, fecha_emision, vigencia_hasta, fecha_desde, fecha_hasta, subtotal, descuento, importe_total, estado)
+select s.solicitud_id, a.agente_id, p.nro_propuesta, p.fecha_emision, p.vigencia_hasta, p.fecha_desde, p.fecha_hasta, p.subtotal, p.descuento, p.importe_total, p.estado
 from 
 (
     select 
         Solicitud_Nro_Solicitud as nro_solicitud,
+        Propuesta_Nro_Propuesta as nro_propuesta,
         Agente_Dni as agente_dni,
         Agente_Nombre as agente_nombre,
         Propuesta_Fecha_Emision as fecha_emision,
@@ -909,5 +911,41 @@ SELECT p.propuesta_id, v.venta_id
 FROM 
 ( 
     SELECT 
-    
-)
+        Venta_Nro_Venta as nro_venta,
+        Propuesta_Nro_Propuesta as nro_propuesta
+    from 
+    GD1C2026.[gd_esquema].[Maestra]
+)m 
+join QUERY_MEVAJI.Propuesta p
+    on p.nro_propuesta = m.nro_propuesta
+join QUERY_MEVAJI.Venta v
+    on v.nro_venta = m.nro_venta
+where m.nro_propuesta is not null AND m.nro_venta is not null
+END
+
+
+GO 
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_detalle_propuesta_hospedaje
+AS
+BEGIN
+INSERT INTO QUERY_MEVAJI.Detalle_Propuesta_Hospedaje (propuesta_id, habitacion_id, fecha_desde, fecha_hasta, cant, precio, subtotal)
+SELECT p.propuesta_id, h.habitacion_id, M.fecha_desde, ,  m.fecha_hasta, m.cant, m.precio, m.subtotal
+FROM
+(
+    SELECT 
+        Propuesta_Nro_Propuesta as nro_propuesta,
+        Hospedaje_Nombre as nombre_hospedaje,
+        Detalle_Propuesta_Hospedaje_Fecha_Desde as fecha_desde,
+        Detalle_Propuesta_Hospedaje_Fecha_Hasta as fecha_hasta,
+        Detalle_Propuesta_Hospedaje_Cant as cant,
+        Detalle_Propuesta_Hospedaje_Precio as precio,
+        Detalle_Propuesta_Hospedaje_Subtotal as subtotal
+    from 
+    GD1C2026.[gd_esquema].[Maestra]
+) as m
+Join query_mejavi.Propuesta p
+    on p.nro_propuesta = m.nro_propuesta
+Join QUERY_MEVAJI.Hospedaje h
+    on h.nombre = m.hospedaje
+where m.nro_propuesta is not null AND m.nombre_hospedaje is not null
+END
