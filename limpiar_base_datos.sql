@@ -1,59 +1,57 @@
 -- SCRIPT PARA LIMPIAR LA BASE DE DATOS
--- Borra todas las tablas del schema QUERY_MEVAJI y sus datos
+-- Borra todas las tablas, procedimientos y el schema QUERY_MEVAJI si existen.
 
 USE [GD1C2026]
 GO
 
--- Deshabilitar constraint checks temporalmente
-ALTER TABLE QUERY_MEVAJI.Detalle_Venta_Excursion DROP CONSTRAINT IF EXISTS FK__Detalle_Venta_Excursion_Venta;
-ALTER TABLE QUERY_MEVAJI.Detalle_Venta_Excursion DROP CONSTRAINT IF EXISTS FK__Detalle_Venta_Excursion_Excursion;
-ALTER TABLE QUERY_MEVAJI.Detalle_Venta_Vuelo DROP CONSTRAINT IF EXISTS FK__Detalle_Venta_Vuelo_Venta;
-ALTER TABLE QUERY_MEVAJI.Detalle_Venta_Vuelo DROP CONSTRAINT IF EXISTS FK__Detalle_Venta_Vuelo_Vuelo;
-ALTER TABLE QUERY_MEVAJI.Detalle_Propuesta_Vuelo DROP CONSTRAINT IF EXISTS FK__Detalle_Propuesta_Vuelo_Propuesta;
-ALTER TABLE QUERY_MEVAJI.Detalle_Propuesta_Vuelo DROP CONSTRAINT IF EXISTS FK__Detalle_Propuesta_Vuelo_Vuelo;
-ALTER TABLE QUERY_MEVAJI.Detalle_Venta_Hospedaje DROP CONSTRAINT IF EXISTS FK__Detalle_Venta_Hospedaje_Venta;
-ALTER TABLE QUERY_MEVAJI.Detalle_Venta_Hospedaje DROP CONSTRAINT IF EXISTS FK__Detalle_Venta_Hospedaje_Habitacion;
-ALTER TABLE QUERY_MEVAJI.Detalle_Propuesta_Hospedaje DROP CONSTRAINT IF EXISTS FK__Detalle_Propuesta_Hospedaje_Propuesta;
-ALTER TABLE QUERY_MEVAJI.Detalle_Propuesta_Hospedaje DROP CONSTRAINT IF EXISTS FK__Detalle_Propuesta_Hospedaje_Habitacion;
-GO
+DECLARE @sql NVARCHAR(MAX) = N'';
 
--- ELIMINAR TABLAS EN ORDEN INVERSO DE DEPENDENCIAS
-DROP TABLE IF EXISTS QUERY_MEVAJI.Detalle_Venta_Excursion;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Detalle_Venta_Vuelo;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Detalle_Propuesta_Vuelo;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Detalle_Venta_Hospedaje;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Detalle_Propuesta_Hospedaje;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Venta;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Propuesta;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Detalle_Solicitud;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Solicitud;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Habitacion;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Hospedaje;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Vuelo;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Aeropuerto;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Aerolinea;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Detalle_Encuesta;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Encuesta;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Cliente;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Agente;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Agencia;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Localidad;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Ciudad;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Provincia;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Excursion;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Estado_De_Propuesta;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Proveedor;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Alianza;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Aspecto;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Medio_De_Pago;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Canal_De_Venta;
-DROP TABLE IF EXISTS QUERY_MEVAJI.Pais;
+-- Eliminar todas las foreign keys del schema QUERY_MEVAJI
+SELECT @sql = @sql + N'ALTER TABLE ' + QUOTENAME(SCHEMA_NAME(o.schema_id)) + N'.' + QUOTENAME(o.name) + N' DROP CONSTRAINT ' + QUOTENAME(f.name) + N';' + CHAR(13)
+FROM sys.foreign_keys AS f
+JOIN sys.objects AS o ON f.parent_object_id = o.object_id
+WHERE SCHEMA_NAME(o.schema_id) = N'QUERY_MEVAJI';
 
--- ELIMINAR PROCEDURES
---DROP PROCEDURE IF EXISTS QUERY_MEVAJI.cargar_paises;
+IF @sql <> N''
+BEGIN
+    EXEC sp_executesql @sql;
+END
 
--- ELIMINAR SCHEMA
---DROP SCHEMA IF EXISTS QUERY_MEVAJI;
+-- Eliminar todas las tablas del schema QUERY_MEVAJI
+SET @sql = N'';
+SELECT @sql = @sql + N'DROP TABLE IF EXISTS QUERY_MEVAJI.' + QUOTENAME(name) + N';' + CHAR(13)
+FROM sys.tables
+WHERE schema_id = SCHEMA_ID(N'QUERY_MEVAJI');
+
+IF @sql <> N''
+BEGIN
+    EXEC sp_executesql @sql;
+END
+
+-- Eliminar todos los procedimientos del schema QUERY_MEVAJI
+SET @sql = N'';
+SELECT @sql = @sql + N'DROP PROCEDURE IF EXISTS QUERY_MEVAJI.' + QUOTENAME(name) + N';' + CHAR(13)
+FROM sys.objects
+WHERE type IN (N'P', N'PC')
+  AND schema_id = SCHEMA_ID(N'QUERY_MEVAJI');
+
+IF @sql <> N''
+BEGIN
+    EXEC sp_executesql @sql;
+END
+
+-- Eliminar el schema si está vacío
+IF EXISTS (SELECT 1 FROM sys.schemas WHERE name = N'QUERY_MEVAJI')
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM sys.objects o
+        JOIN sys.schemas s ON o.schema_id = s.schema_id
+        WHERE s.name = N'QUERY_MEVAJI'
+    )
+    BEGIN
+        EXEC(N'DROP SCHEMA QUERY_MEVAJI');
+    END
+END
 
 PRINT 'Base de datos limpiada correctamente - Schema QUERY_MEVAJI eliminado';
 GO

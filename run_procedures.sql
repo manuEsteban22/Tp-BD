@@ -52,3 +52,39 @@ GO
 
 EXEC QUERY_MEVAJI.cargar_vuelos;
 GO
+
+EXEC QUERY_MEVAJI.cargar_hospedajes;
+GO
+
+EXEC QUERY_MEVAJI.cargar_habitaciones;
+GO
+
+EXEC QUERY_MEVAJI.cargar_solicitudes;
+GO
+
+EXEC QUERY_MEVAJI.cargar_detalle_solicitudes;
+GO
+
+EXEC QUERY_MEVAJI.cargar_propuestas;
+GO
+
+EXEC QUERY_MEVAJI.cargar_ventas;
+GO
+
+EXEC QUERY_MEVAJI.cargar_propuesta_ventas;
+GO
+
+EXEC QUERY_MEVAJI.cargar_detalle_propuesta_hospedaje;
+GO
+
+EXEC QUERY_MEVAJI.cargar_detalle_venta_hospedaje;
+GO
+
+EXEC QUERY_MEVAJI.cargar_detalle_propuesta_vuelo;
+GO
+
+EXEC QUERY_MEVAJI.cargar_detalle_venta_vuelo;
+GO
+
+EXEC QUERY_MEVAJI.cargar_detalle_venta_excursion;
+GO

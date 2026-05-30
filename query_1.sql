@@ -1,7 +1,7 @@
 USE [GD1C2026]
 GO
 
---CREATE SCHEMA QUERY_MEVAJI;
+CREATE SCHEMA QUERY_MEVAJI;
 GO
 
 -- CREACION DE TABLAS --
@@ -780,7 +780,7 @@ BEGIN
 
 INSERT INTO QUERY_MEVAJI.Solicitud (cliente_id, agencia_id, nro_solicitud, fecha_solicitud, fecha_inicio_tentativa, 
                             fecha_fin_tentativa, cant_pax, observaciones, presupuesto_estimado)
-    SELECT s.cliente_id, s.agencia_id, s.nro_solicitud, s.fecha_solicitud, s.fecha_inicio_tentativa,
+    SELECT c.cliente_id, a.agencia_id, s.nro_solicitud, s.fecha_solicitud, s.fecha_inicio_tentativa,
            s.fecha_fin_tentativa, s.cant_pax, s.observaciones, s.presupuesto_estimado
     FROM
     (
@@ -865,7 +865,7 @@ from
 join QUERY_MEVAJI.Solicitud s
     on s.nro_solicitud = p.nro_solicitud
 join QUERY_MEVAJI.Agente a
-    on a.agente_dni = p.agente_dni
+    on a.dni = p.agente_dni
  where p.nro_solicitud is not null AND p.agente_dni is not null
 END 
 
@@ -903,10 +903,10 @@ END
 
 
 GO 
-CREATE OR ALTER PROCEDURE QUERY_MEJAVI.cargar_propuesta_ventas
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_propuesta_ventas
 AS 
 BEGIN 
-INSERT INTO QUERY_MEJAVI.Propuesta_Ventas(propuesta_id, venta_id)
+INSERT INTO QUERY_MEVAJI.Propuesta_Ventas(propuesta_id, venta_id)
 SELECT p.propuesta_id, v.venta_id
 FROM 
 ( 
@@ -944,7 +944,7 @@ FROM
     from 
     GD1C2026.[gd_esquema].[Maestra]
 ) as m
-Join query_mejavi.Propuesta p
+Join QUERY_MEVAJI.Propuesta p
     on p.nro_propuesta = m.nro_propuesta
 Join QUERY_MEVAJI.Habitacion h
     on h.nombre = m.nombre_habitacion
@@ -958,7 +958,7 @@ CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_detalle_venta_hospedaje
 AS
 BEGIN
 INSERT INTO QUERY_MEVAJI.Detalle_Venta_Hospedaje (venta_id, habitacion_id, fecha_desde, fecha_hasta, cant, precio_unitario, subtotal, cod_reserva)
-SELECT v.ventf.id, h.habitacion_id, m.fecha_desde, m.fecha_hasta, m.cant, m.precio_unitario, m.subtotal, m.cod_reserva
+SELECT v.venta_id, h.habitacion_id, m.fecha_desde, m.fecha_hasta, m.cant, m.precio_unitario, m.subtotal, m.cod_reserva
 FROM
 (
     SELECT 
@@ -967,7 +967,7 @@ FROM
         Habitacion_Descripcion as descripcion_habitacion,
         Detalle_Venta_Hospedaje_Fecha_Desde as fecha_desde,
         Detalle_Venta_Hospedaje_Fecha_Hasta as fecha_hasta,
-        Detalle_Venta_Hospedaje_Cant as cant,
+        Detalle_Venta_Hospedaje_Cantidad as cant,
         Detalle_Venta_Hospedaje_Precio_Unitario as precio_unitario,
         Detalle_Venta_Hospedaje_Subtotal as subtotal,
         Detalle_Venta_Hospedaje_Cod_Reserva as cod_reserva
@@ -1001,7 +1001,7 @@ FROM
     from 
     GD1C2026.[gd_esquema].[Maestra]
 ) as m
-Join query_mejavi.Propuesta p
+Join QUERY_MEVAJI.Propuesta p
     on p.nro_propuesta = m.nro_propuesta
 Join QUERY_MEVAJI.Vuelo v
     on v.aeropuesto_origen_id = (select aeropuerto_id from QUERY_MEVAJI.Aeropuerto where descripcion = m.aeropuerto_origen)
@@ -1025,7 +1025,7 @@ FROM
         Aerolinea_Nombre as nombre_aerolinea,
         Aeropuerto_Salida_Descripcion as aeropuerto_origen,
         Aeropuerto_Llegada_Descripcion as aeropuerto_destino,
-        Detalle_Venta_Vuelo_Cant_Pasajes as cant_pasajes,
+        Detalle_Venta_Vuelo_Cantidad_Pasajes as cant_pasajes,
         Detalle_Venta_Vuelo_Precio_Unitario as precio_unitario,
         Detalle_Venta_Vuelo_Subtotal as subtotal,
         Detalle_Venta_Vuelo_Cod_Reserva as cod_reserva
