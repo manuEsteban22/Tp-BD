@@ -181,7 +181,7 @@ CREATE TABLE QUERY_MEVAJI.Solicitud (            -- cargado
     presupuesto_estimado DECIMAL(18,2)
 );
 
-CREATE TABLE QUERY_MEVAJI.Detalle_Solicitud (
+CREATE TABLE QUERY_MEVAJI.Detalle_Solicitud ( -- CARGADO
     detalle_solicitud_id INT IDENTITY(1,1) PRIMARY KEY,
     solicitud_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Solicitud(solicitud_id),
     ciudad_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Ciudad(ciudad_id),
@@ -189,7 +189,7 @@ CREATE TABLE QUERY_MEVAJI.Detalle_Solicitud (
     observaciones nvarchar(max)
 );
 
-CREATE TABLE QUERY_MEVAJI.Propuesta (
+CREATE TABLE QUERY_MEVAJI.Propuesta ( -- CARGADO 
     propuesta_id INT IDENTITY(1,1) PRIMARY KEY,
     solicitud_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Solicitud(solicitud_id),
     agente_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Agente(agente_id),
@@ -203,7 +203,7 @@ CREATE TABLE QUERY_MEVAJI.Propuesta (
     estado nvarchar(255)
 );
 
-CREATE TABLE QUERY_MEVAJI.Venta (
+CREATE TABLE QUERY_MEVAJI.Venta ( -- CARGADO
     venta_id INT IDENTITY(1,1) PRIMARY KEY,
     cliente_id INT NOT NULL FOREIGN KEY REFERENCES QUERY_MEVAJI.Cliente(cliente_id),
     nro_venta BIGINT,
@@ -837,9 +837,6 @@ END
 
 
 
-
--------------------
-
 GO 
 CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_propuestas 
 AS  
@@ -869,3 +866,48 @@ join QUERY_MEVAJI.Agente a
     on a.agente_dni = p.agente_dni
  where p.nro_solicitud is not null AND p.agente_dni is not null
 END 
+
+
+GO 
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_ventas
+AS  
+BEGIN 
+insert into QUERY_MEVAJI.Venta (cliente_id, nro_venta, canal_de_venta_id, medio_de_pago_id, fecha_venta, subtotal, descuento, importe_total)
+select c.cliente_id, v.nro_venta, cv.canal_de_venta_id, mp.medio_de_pago_id, v.fecha_venta, v.subtotal, v.descuento, v.importe_total
+from        
+(
+    select 
+        Cliente_Dni as cliente_dni,
+        Cliente_Nombre as cliente_nombre,
+        Venta_Nro_Venta as nro_venta,
+        Venta_Canal_Venta as canal_de_venta,
+        Venta_Medio_Pago as medio_de_pago,
+        Venta_Fecha_Venta as fecha_venta,
+        Venta_Subtotal as subtotal,
+        Venta_Descuento as descuento,
+        Venta_Importe_Total as importe_total
+    from 
+    GD1C2026.[gd_esquema].[Maestra]
+) as v
+join QUERY_MEVAJI.Cliente c
+    on c.dni = v.cliente_dni
+join QUERY_MEVAJI.Canal_De_Venta cv
+    on cv.descripcion = v.canal_de_venta 
+join QUERY_MEVAJI.Medio_De_Pago mp
+    on mp.descripcion = v.medio_de_pago
+where v.nro_venta is not null AND v.cliente_dni is not null
+
+END 
+
+
+GO 
+CREATE OR ALTER PROCEDURE QUERY_MEJAVI.cargar_propuesta_ventas
+AS 
+BEGIN 
+INSERT INTO QUERY_MEJAVI.Propuesta_Ventas(propuesta_id, venta_id)
+SELECT p.propuesta_id, v.venta_id
+FROM 
+( 
+    SELECT 
+    
+)
