@@ -260,7 +260,7 @@ CREATE TABLE QUERY_MEVAJI.Detalle_Propuesta_Vuelo ( -- CARGADO
     FOREIGN KEY (vuelo_id) REFERENCES QUERY_MEVAJI.Vuelo(vuelo_id)
 );
 
-CREATE TABLE QUERY_MEVAJI.Detalle_Venta_Vuelo (
+CREATE TABLE QUERY_MEVAJI.Detalle_Venta_Vuelo ( -- CARGADO
     venta_id INT NOT NULL,
     vuelo_id INT NOT NULL,
     cant_pasajes INT,
@@ -272,7 +272,7 @@ CREATE TABLE QUERY_MEVAJI.Detalle_Venta_Vuelo (
     FOREIGN KEY (vuelo_id) REFERENCES QUERY_MEVAJI.Vuelo(vuelo_id)
 );
 
-CREATE TABLE QUERY_MEVAJI.Detalle_Venta_Excursion (
+CREATE TABLE QUERY_MEVAJI.Detalle_Venta_Excursion ( -- CARGADO
     venta_id INT NOT NULL,
     excursion_id INT NOT NULL,
     fecha_reserva DATE,
@@ -1009,4 +1009,69 @@ Join QUERY_MEVAJI.Vuelo v
     and v.aerolinea_id = (select aerolinea_id from QUERY_MEVAJI.Aerolinea where nombre = m.nombre_aerolinea)
 where m.nro_propuesta is not null AND m.nombre_aerolinea is not null
 AND m.aeropuerto_origen is not null AND m.aeropuerto_destino is not null
+END
+
+
+GO
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_detalle_venta_vuelo
+AS
+BEGIN
+INSERT INTO QUERY_MEVAJI.Detalle_Venta_Vuelo (venta_id, vuelo_id, cant_pasajes, precio_unitario, subtotal, cod_reserva)
+SELECT v.venta_id, vu.vuelo_id, m.cant_pasajes, m.precio_unitario, m.subtotal, m.cod_reserva
+FROM
+(
+    SELECT 
+        Venta_Nro_Venta as nro_venta,
+        Aerolinea_Nombre as nombre_aerolinea,
+        Aeropuerto_Salida_Descripcion as aeropuerto_origen,
+        Aeropuerto_Llegada_Descripcion as aeropuerto_destino,
+        Detalle_Venta_Vuelo_Cant_Pasajes as cant_pasajes,
+        Detalle_Venta_Vuelo_Precio_Unitario as precio_unitario,
+        Detalle_Venta_Vuelo_Subtotal as subtotal,
+        Detalle_Venta_Vuelo_Cod_Reserva as cod_reserva
+    from 
+    GD1C2026.[gd_esquema].[Maestra]
+) as m
+Join QUERY_MEVAJI.Venta v
+    on v.nro_venta = m.nro_venta
+Join QUERY_MEVAJI.Vuelo vu
+    on vu.aeropuesto_origen_id = (select aeropuerto_id from QUERY_MEVAJI.Aeropuerto where descripcion = m.aeropuerto_origen)
+    and vu.aeropuerto_destino_id = (select aeropuerto_id from QUERY_MEVAJI.Aeropuerto where descripcion = m.aeropuerto_destino)
+    and vu.aerolinea_id = (select aerolinea_id from QUERY_MEVAJI.Aerolinea where nombre = m.nombre_aerolinea)
+
+where m.nro_venta is not null AND m.nombre_aerolinea is not null
+
+AND m.aeropuerto_origen is not null AND m.aeropuerto_destino is not null
+
+END 
+
+
+GO
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_detalle_venta_excursion
+AS
+BEGIN
+INSERT INTO QUERY_MEVAJI.Detalle_Venta_Excursion (venta_id, excursion_id, fecha_reserva, cant, precio_unitario, subtotal, cod_reserva)
+SELECT v.venta_id, e.excursion_id, m.fecha_reserva, m.cant, m.precio_unitario, m.subtotal, m.cod_reserva
+FROM
+(
+    SELECT 
+        Venta_Nro_Venta as nro_venta,
+        Excursion_Nombre as nombre_excursion,
+        Excursion_Descripcion as descripcion_excursion,
+        Detalle_Venta_Excursion_Fecha_Reserva as fecha_reserva,
+        Detalle_Venta_Excursion_Cant as cant,
+        Detalle_Venta_Excursion_Precio_Unitario as precio_unitario,
+        Detalle_Venta_Excursion_Subtotal as subtotal,
+        Detalle_Venta_Excursion_Cod_Reserva as cod_reserva
+    from 
+    GD1C2026.[gd_esquema].[Maestra]
+) as m  
+Join QUERY_MEVAJI.Venta v
+    on v.nro_venta = m.nro_venta
+
+Join QUERY_MEVAJI.Excursion e
+    on e.nombre = m.nombre_excursion
+    and e.descripcion = m.descripcion_excursion
+
+where m.nro_venta is not null AND m.nombre_excursion is not null AND m.descripcion_excursion is not null
 END
