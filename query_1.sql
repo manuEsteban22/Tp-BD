@@ -833,3 +833,39 @@ INSERT INTO QUERY_MEVAJI.Detalle_Solicitud (solicitud_id, ciudad_id, cant_dias_a
     
     WHERE d.nro_solicitud IS NOT NULL
 
+END 
+
+
+
+
+-------------------
+
+GO 
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_propuestas 
+AS  
+BEGIN
+insert into QUERY_MEVAJI.Propuesta (solicitud_id, agente_id, fecha_emision, vigencia_hasta, fecha_desde, fecha_hasta, subtotal, descuento, importe_total, estado)
+select s.solicitud_id, a.agente_id, p.fecha_emision, p.vigencia_hasta, p.fecha_desde, p.fecha_hasta, p.subtotal, p.descuento, p.importe_total, p.estado
+from 
+(
+    select 
+        Solicitud_Nro_Solicitud as nro_solicitud,
+        Agente_Dni as agente_dni,
+        Agente_Nombre as agente_nombre,
+        Propuesta_Fecha_Emision as fecha_emision,
+        Propuesta_Vigencia_Hasta as vigencia_hasta,
+        Propuesta_Fecha_Desde as fecha_desde,
+        Propuesta_Fecha_Hasta as fecha_hasta,
+        Propuesta_Subtotal as subtotal,
+        Propuesta_Descuento as descuento,
+        Propuesta_Importe_Total as importe_total,
+        Propuesta_Estado as estado
+    from 
+    GD1C2026.[gd_esquema].[Maestra]
+) as p
+join QUERY_MEVAJI.Solicitud s
+    on s.nro_solicitud = p.nro_solicitud
+join QUERY_MEVAJI.Agente a
+    on a.agente_dni = p.agente_dni
+ where p.nro_solicitud is not null AND p.agente_dni is not null
+END 
