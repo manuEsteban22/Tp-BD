@@ -235,7 +235,7 @@ CREATE TABLE QUERY_MEVAJI.Detalle_Propuesta_Hospedaje ( --CARGADO
     FOREIGN KEY (habitacion_id) REFERENCES QUERY_MEVAJI.Habitacion(habitacion_id)
 );
 
-CREATE TABLE QUERY_MEVAJI.Detalle_Venta_Hospedaje (
+CREATE TABLE QUERY_MEVAJI.Detalle_Venta_Hospedaje (  -- CARGADO
     venta_id INT NOT NULL,
     habitacion_id INT NOT NULL,
     fecha_desde DATE,
@@ -249,7 +249,7 @@ CREATE TABLE QUERY_MEVAJI.Detalle_Venta_Hospedaje (
     FOREIGN KEY (habitacion_id) REFERENCES QUERY_MEVAJI.Habitacion(habitacion_id)
 );
 
-CREATE TABLE QUERY_MEVAJI.Detalle_Propuesta_Vuelo (
+CREATE TABLE QUERY_MEVAJI.Detalle_Propuesta_Vuelo ( -- CARGADO
     propuesta_id INT NOT NULL,
     vuelo_id INT NOT NULL,
     cant_pasajes INT,
@@ -929,12 +929,13 @@ CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_detalle_propuesta_hospedaje
 AS
 BEGIN
 INSERT INTO QUERY_MEVAJI.Detalle_Propuesta_Hospedaje (propuesta_id, habitacion_id, fecha_desde, fecha_hasta, cant, precio, subtotal)
-SELECT p.propuesta_id, h.habitacion_id, M.fecha_desde, ,  m.fecha_hasta, m.cant, m.precio, m.subtotal
+SELECT p.propuesta_id, h.habitacion_id, m.fecha_desde,   m.fecha_hasta, m.cant, m.precio, m.subtotal
 FROM
 (
     SELECT 
         Propuesta_Nro_Propuesta as nro_propuesta,
-        Hospedaje_Nombre as nombre_hospedaje,
+        Habitacion_Nombre as nombre_habitacion,
+        Habitacion_Descripcion as descripcion_habitacion,
         Detalle_Propuesta_Hospedaje_Fecha_Desde as fecha_desde,
         Detalle_Propuesta_Hospedaje_Fecha_Hasta as fecha_hasta,
         Detalle_Propuesta_Hospedaje_Cant as cant,
@@ -945,7 +946,67 @@ FROM
 ) as m
 Join query_mejavi.Propuesta p
     on p.nro_propuesta = m.nro_propuesta
-Join QUERY_MEVAJI.Hospedaje h
-    on h.nombre = m.hospedaje
-where m.nro_propuesta is not null AND m.nombre_hospedaje is not null
+Join QUERY_MEVAJI.Habitacion h
+    on h.nombre = m.nombre_habitacion
+    and h.descripcion = m.descripcion_habitacion
+where m.nro_propuesta is not null AND m.nombre_habitacion is not null AND m.descripcion_habitacion is not null
+END
+
+
+GO
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_detalle_venta_hospedaje
+AS
+BEGIN
+INSERT INTO QUERY_MEVAJI.Detalle_Venta_Hospedaje (venta_id, habitacion_id, fecha_desde, fecha_hasta, cant, precio_unitario, subtotal, cod_reserva)
+SELECT v.ventf.id, h.habitacion_id, m.fecha_desde, m.fecha_hasta, m.cant, m.precio_unitario, m.subtotal, m.cod_reserva
+FROM
+(
+    SELECT 
+        Venta_Nro_Venta as nro_venta,
+        Habitacion_Nombre as nombre_habitacion,
+        Habitacion_Descripcion as descripcion_habitacion,
+        Detalle_Venta_Hospedaje_Fecha_Desde as fecha_desde,
+        Detalle_Venta_Hospedaje_Fecha_Hasta as fecha_hasta,
+        Detalle_Venta_Hospedaje_Cant as cant,
+        Detalle_Venta_Hospedaje_Precio_Unitario as precio_unitario,
+        Detalle_Venta_Hospedaje_Subtotal as subtotal,
+        Detalle_Venta_Hospedaje_Cod_Reserva as cod_reserva
+    from 
+    GD1C2026.[gd_esquema].[Maestra]
+) as m
+Join QUERY_MEVAJI.Venta v
+    on v.nro_venta = m.nro_venta
+Join QUERY_MEVAJI.Habitacion h
+    on h.nombre = m.nombre_habitacion
+    and h.descripcion = m.descripcion_habitacion
+where m.nro_venta is not null AND m.nombre_habitacion is not null AND m.descripcion_habitacion is not null
+END
+
+GO
+CREATE OR ALTER PROCEDURE QUERY_MEVAJI.cargar_detalle_propuesta_vuelo
+AS
+BEGIN
+INSERT INTO QUERY_MEVAJI.Detalle_Propuesta_Vuelo (propuesta_id, vuelo_id, cant_pasajes, precio, subtotal)
+SELECT p.propuesta_id, v.vuelo_id, m.cant_pasajes, m.precio, m.subtotal
+FROM
+(
+    SELECT 
+        Propuesta_Nro_Propuesta as nro_propuesta,
+        Aerolinea_Nombre as nombre_aerolinea,
+        Aeropuerto_Salida_Descripcion as aeropuerto_origen,
+        Aeropuerto_Llegada_Descripcion as aeropuerto_destino,
+        Detalle_Propuesta_Vuelo_Cant_Pasajes as cant_pasajes,
+        Detalle_Propuesta_Vuelo_Precio as precio,
+        Detalle_Propuesta_Vuelo_Subtotal as subtotal
+    from 
+    GD1C2026.[gd_esquema].[Maestra]
+) as m
+Join query_mejavi.Propuesta p
+    on p.nro_propuesta = m.nro_propuesta
+Join QUERY_MEVAJI.Vuelo v
+    on v.aeropuesto_origen_id = (select aeropuerto_id from QUERY_MEVAJI.Aeropuerto where descripcion = m.aeropuerto_origen)
+    and v.aeropuerto_destino_id = (select aeropuerto_id from QUERY_MEVAJI.Aeropuerto where descripcion = m.aeropuerto_destino)
+    and v.aerolinea_id = (select aerolinea_id from QUERY_MEVAJI.Aerolinea where nombre = m.nombre_aerolinea)
+where m.nro_propuesta is not null AND m.nombre_aerolinea is not null
+AND m.aeropuerto_origen is not null AND m.aeropuerto_destino is not null
 END
